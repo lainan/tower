@@ -1,2 +1,3 @@
 # tower
-Phaser game
+
+Side-scrolling plataformer with roguelike elements.
