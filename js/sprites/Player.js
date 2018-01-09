@@ -1,7 +1,6 @@
 /* global Phaser, p2*/
 
 var Player = function (game, x, y) {
-    this.game = game;
     this.yAxis = p2.vec2.fromValues(0, 1);
     Phaser.Sprite.call(this, game, x, y, 'mushroom');
     this.scale.setTo(0.5);

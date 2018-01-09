@@ -6,9 +6,8 @@ var gameState = function () {
 
     var tower;
     var plataforms;
+    var shadows;
     var player;
-
-    var test;
 
     var cursors;
     var jumpTimer;
@@ -33,7 +32,15 @@ gameState.prototype = {
         }
 
         // BitmapData
-        game.bmd = game.add.bitmapData(220, 220);
+        game.global = {
+            scaleFactor: 1,
+            towerAngle: 0,
+            bmd: game.make.bitmapData(220, 220)
+        };
+        var tempTowerSection = new TowerSection(game, 0, 0);
+        game.global.towerWidth = tempTowerSection.width;
+        game.global.towerHeight = tempTowerSection.height
+        tempTowerSection.destroy();
 
         game.input.gamepad.start();
         pad1 = game.input.gamepad.pad1;
@@ -47,25 +54,12 @@ gameState.prototype = {
 
         tower = new Tower(game);
         plataforms = game.add.group();
-        // for (var i = 0; i < 136; i++) {
-        //     plataforms.add(new Plataform(game, (i * 30) % 359, (i * 140)));
-        // }
-        // for (var i = 0; i < 136; i++) {
-        //     plataforms.add(new Plataform(game, (i * 329) % 359, (i * 140)));
-        // }
 
-        for (var i = 0; i < 274; i++) {
+        for (var i = 0; i < 275; i++) {
             plataforms.add(new Plataform(game, (i * 11) % 359, (i * 17)));
         }
 
         player = new Player(game, game.world.centerX, game.world.height - 50);
-
-        // plataforms.add(new Plataform(game, 0, game.world.centerY));
-        // for (var i = 0; i < 360; i += 29) {
-        //     plataforms.add(new Plataform(game, i, game.world.centerY));
-        // }
-
-        // test = new Plataform(game, 0, game.world.centerY);
 
         game.camera.follow(player);
         game.camera.x = game.world.centerX;
@@ -74,7 +68,6 @@ gameState.prototype = {
 
         cursors = game.input.keyboard.createCursorKeys();
         jumpButton = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
-        testButton = game.input.keyboard.addKey(Phaser.Keyboard.ENTER);
 
 
         // // create our virtual game controller buttons
@@ -99,26 +92,35 @@ gameState.prototype = {
         // buttonright.events.onInputDown.add(function(){right=true;});
         // buttonright.events.onInputUp.add(function(){right=false;});
         //
-        // plataforms.sort('z', Phaser.Group.SORT_ASCENDING);
     },
 
     render: function() {},
 
     update: function () {
-
-
-
+        // Keyboard
         if (cursors.left.isDown) {
-            plataforms.callAll('move', null, 'left');
-            tower.updateAnimation('left');
+            if (game.global.towerAngle === 358) {
+                game.global.towerAngle = 0;
+            } else {
+                game.global.towerAngle = game.global.towerAngle + 1;
+            }
+            tower.updateState();
             background.move('left');
-            plataforms.sort('z', Phaser.Group.SORT_ASCENDING);
+            plataforms.callAll('updateState', null);
+            plataforms.sort('depth', Phaser.Group.SORT_ASCENDING);
+            console.log(game.global.towerAngle);
         }
         else if (cursors.right.isDown) {
-            plataforms.callAll('move', null, 'right');
-            tower.updateAnimation('right');
+            if (game.global.towerAngle === 0) {
+                game.global.towerAngle = 358;
+            } else {
+                game.global.towerAngle = game.global.towerAngle - 1;
+            }
+            tower.updateState();
             background.move('right');
-            plataforms.sort('z', Phaser.Group.SORT_ASCENDING);
+            plataforms.callAll('updateState', null);
+            plataforms.sort('depth', Phaser.Group.SORT_ASCENDING);
+            console.log(game.global.towerAngle);
         }
 
         if (jumpButton.isDown && game.time.now > jumpTimer && player.checkIfCanJump()) {
