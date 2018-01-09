@@ -47,14 +47,14 @@ gameState.prototype = {
         left = right = jump = false;
 
         game.stage.setBackgroundColor('4488AA');
-        game.world.setBounds(0, 0, screenWidth, screenHeight * 5);
+        game.world.setBounds(0, 0, screenWidth, screenHeight * 1);
 
         background = new Background(game);
 
         tower = new Tower(game);
         plataforms = game.add.group();
 
-        for (var i = 0; i < 90; i++) {
+        for (var i = 0; i < 20; i++) {
             plataforms.add(new Plataform(game, (i * 52) % 359, (i * 40)));
         }
 
