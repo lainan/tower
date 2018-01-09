@@ -14,7 +14,7 @@ var loadState = {
         loadingLabel.anchor.setTo(0.5, 0.5);
 
         //Load your images, spritesheets, bitmaps...
-        game.load.image('game-logo', './assets/sprites/boilerplate-logo.png');
+        // game.load.image('game-logo', './assets/sprites/boilerplate-logo.png');
         game.load.image('mushroom', 'assets/sprites/mushroom.png');
 
         game.load.spritesheet('buttonvertical', 'assets/buttons/button-vertical.png',64,64);

@@ -54,7 +54,7 @@ gameState.prototype = {
         tower = new Tower(game);
         plataforms = game.add.group();
 
-        for (var i = 0; i < 138; i++) {
+        for (var i = 0; i < 137; i++) {
             plataforms.add(new Plataform(game, (i * 22) % 359, (i * 34)));
         }
 
@@ -106,7 +106,6 @@ gameState.prototype = {
             background.move('left');
             plataforms.callAll('updateState', null);
             plataforms.sort('depth', Phaser.Group.SORT_ASCENDING);
-            console.log(game.global.towerAngle);
         }
         else if (cursors.right.isDown) {
             if (game.global.towerAngle === 0) {
@@ -118,7 +117,6 @@ gameState.prototype = {
             background.move('right');
             plataforms.callAll('updateState', null);
             plataforms.sort('depth', Phaser.Group.SORT_ASCENDING);
-            console.log(game.global.towerAngle);
         }
 
         if (jumpButton.isDown && game.time.now > jumpTimer && player.checkIfCanJump()) {
