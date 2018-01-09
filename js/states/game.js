@@ -27,11 +27,10 @@ gameState.prototype = {
     },
 
     create: function () {
-        if (!game.device.desktop) {
-            // game.input.onDown.add(this.goFullScreen, this);
-        }
+        // if (!game.device.desktop) {
+        //     game.input.onDown.add(this.goFullScreen, this);
+        // }
 
-        // BitmapData
         game.global = {
             scaleFactor: 1,
             towerAngle: 0,
@@ -69,29 +68,28 @@ gameState.prototype = {
         cursors = game.input.keyboard.createCursorKeys();
         jumpButton = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
 
+        // create our virtual game controller buttons
+        buttonjump = game.add.button(game.width - 100, game.height/2, 'buttonjump', null, this, 0, 1, 0, 1);  //game, x, y, key, callback, callbackContext, overFrame, outFrame, downFrame, upFrame
+        buttonjump.fixedToCamera = true;  //our buttons should stay on the same place
+        buttonjump.events.onInputOver.add(function(){jump=true;});
+        buttonjump.events.onInputOut.add(function(){jump=false;});
+        buttonjump.events.onInputDown.add(function(){jump=true;});
+        buttonjump.events.onInputUp.add(function(){jump=false;});
 
-        // // create our virtual game controller buttons
-        // buttonjump = game.add.button(game.width - 100, game.height/2, 'buttonjump', null, this, 0, 1, 0, 1);  //game, x, y, key, callback, callbackContext, overFrame, outFrame, downFrame, upFrame
-        // buttonjump.fixedToCamera = true;  //our buttons should stay on the same place
-        // buttonjump.events.onInputOver.add(function(){jump=true;});
-        // buttonjump.events.onInputOut.add(function(){jump=false;});
-        // buttonjump.events.onInputDown.add(function(){jump=true;});
-        // buttonjump.events.onInputUp.add(function(){jump=false;});
-        //
-        // buttonleft = game.add.button(10, game.height/2, 'buttonhorizontal', null, this, 0, 1, 0, 1);
-        // buttonleft.fixedToCamera = true;
-        // buttonleft.events.onInputOver.add(function(){left=true;});
-        // buttonleft.events.onInputOut.add(function(){left=false;});
-        // buttonleft.events.onInputDown.add(function(){left=true;});
-        // buttonleft.events.onInputUp.add(function(){left=false;});
-        //
-        // buttonright = game.add.button(160, game.height/2, 'buttonhorizontal', null, this, 0, 1, 0, 1);
-        // buttonright.fixedToCamera = true;
-        // buttonright.events.onInputOver.add(function(){right=true;});
-        // buttonright.events.onInputOut.add(function(){right=false;});
-        // buttonright.events.onInputDown.add(function(){right=true;});
-        // buttonright.events.onInputUp.add(function(){right=false;});
-        //
+        buttonleft = game.add.button(10, game.height/2, 'buttonhorizontal', null, this, 0, 1, 0, 1);
+        buttonleft.fixedToCamera = true;
+        buttonleft.events.onInputOver.add(function(){left=true;});
+        buttonleft.events.onInputOut.add(function(){left=false;});
+        buttonleft.events.onInputDown.add(function(){left=true;});
+        buttonleft.events.onInputUp.add(function(){left=false;});
+
+        buttonright = game.add.button(160, game.height/2, 'buttonhorizontal', null, this, 0, 1, 0, 1);
+        buttonright.fixedToCamera = true;
+        buttonright.events.onInputOver.add(function(){right=true;});
+        buttonright.events.onInputOut.add(function(){right=false;});
+        buttonright.events.onInputDown.add(function(){right=true;});
+        buttonright.events.onInputUp.add(function(){right=false;});
+
     },
 
     render: function() {},
@@ -128,23 +126,23 @@ gameState.prototype = {
             jumpTimer = game.time.now + 100;
         }
 
-        // // Virtual controller
-        // if (left) {
-        //     plataforms.callAll('move', null, 'left');
-        //     tower.updateAnimation('left');
-        // } else if (right) {
-        //     plataforms.callAll('move', null, 'right');
-        //     tower.updateAnimation('right');
-        // }
-        // if (jump && game.time.now > jumpTimer && player.checkIfCanJump()) {
-        //     player.jump();
-        //     jumpTimer = game.time.now + 100;
-        // }
-        // if (game.input.currentPointers == 0 && !game.input.activePointer.isMouse) {
-        //     right = false;
-        //     left = false;
-        //     jump = false;
-        // }
+        // Virtual controller
+        if (left) {
+            plataforms.callAll('move', null, 'left');
+            tower.updateAnimation('left');
+        } else if (right) {
+            plataforms.callAll('move', null, 'right');
+            tower.updateAnimation('right');
+        }
+        if (jump && game.time.now > jumpTimer && player.checkIfCanJump()) {
+            player.jump();
+            jumpTimer = game.time.now + 100;
+        }
+        if (game.input.currentPointers == 0 && !game.input.activePointer.isMouse) {
+            right = false;
+            left = false;
+            jump = false;
+        }
 
         // Controller
         // if (pad1.isDown(Phaser.Gamepad.XBOX360_DPAD_LEFT) || pad1.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X) < -0.1) {
