@@ -54,7 +54,7 @@ gameState.prototype = {
         tower = new Tower(game);
         plataforms = game.add.group();
 
-        for (var i = 0; i < 100; i++) {
+        for (var i = 0; i < 138; i++) {
             plataforms.add(new Plataform(game, (i * 22) % 359, (i * 34)));
         }
 
