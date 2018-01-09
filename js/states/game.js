@@ -54,7 +54,7 @@ gameState.prototype = {
         tower = new Tower(game);
         plataforms = game.add.group();
 
-        for (var i = 0; i < 67; i++) {
+        for (var i = 0; i < 130; i++) {
             plataforms.add(new Plataform(game, (i * 44) % 359, (i * 34)));
         }
 
@@ -96,7 +96,7 @@ gameState.prototype = {
 
     update: function () {
         // Keyboard
-        if (cursors.left.isDown) {
+        if (cursors.left.isDown || left) {
             if (game.global.towerAngle === 358) {
                 game.global.towerAngle = 0;
             } else {
@@ -107,7 +107,7 @@ gameState.prototype = {
             plataforms.callAll('updateState', null);
             plataforms.sort('depth', Phaser.Group.SORT_ASCENDING);
         }
-        else if (cursors.right.isDown) {
+        else if (cursors.right.isDown || right) {
             if (game.global.towerAngle === 0) {
                 game.global.towerAngle = 358;
             } else {
@@ -119,23 +119,12 @@ gameState.prototype = {
             plataforms.sort('depth', Phaser.Group.SORT_ASCENDING);
         }
 
-        if (jumpButton.isDown && game.time.now > jumpTimer && player.checkIfCanJump()) {
+        if ((jump || jumpButton.isDown) && game.time.now > jumpTimer && player.checkIfCanJump()) {
             player.jump();
             jumpTimer = game.time.now + 100;
         }
 
         // Virtual controller
-        if (left) {
-            plataforms.callAll('move', null, 'left');
-            tower.updateAnimation('left');
-        } else if (right) {
-            plataforms.callAll('move', null, 'right');
-            tower.updateAnimation('right');
-        }
-        if (jump && game.time.now > jumpTimer && player.checkIfCanJump()) {
-            player.jump();
-            jumpTimer = game.time.now + 100;
-        }
         if (game.input.currentPointers == 0 && !game.input.activePointer.isMouse) {
             right = false;
             left = false;
