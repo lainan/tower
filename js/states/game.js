@@ -172,6 +172,6 @@ gameState.prototype = {
     },
 
     goFullScreen: function() {
-        game.scale.startFullScreen(false);
+        game.scale.startFullScreen(true);
     }
 };
