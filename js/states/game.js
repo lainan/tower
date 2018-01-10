@@ -56,9 +56,9 @@ gameState.prototype = {
         tower = new Tower(game);
         plataforms = game.add.group();
         shadows = game.add.group();
-
-        for (var i = 0; i < 25; i++) {
-            plataforms.add(new Plataform(game, (i * 54) % 359, 300 + (i * 40)));
+        var platformSeparation = 40;
+        for (var i = 0; i < ((game.world.bounds.height - 300) / platformSeparation); i++) {
+            plataforms.add(new Plataform(game, (i * 54) % 359, 300 + (i * platformSeparation)));
             shadows.add(new Shadow(game, plataforms.getAt(i), 220, -10));
         }
 
