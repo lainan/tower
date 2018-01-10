@@ -29,11 +29,14 @@ gameState.prototype = {
     },
 
     create: function () {
+        game.scale.fullScreenScaleMode = Phaser.ScaleManager.EXACT_FIT;
+
         game.global = {
             scaleFactor: 1,
             towerAngle: 0,
             bmd: game.make.bitmapData(100, 100)
         };
+
         var tempTowerSection = new TowerSection(game, 0, 0);
         game.global.towerWidth = tempTowerSection.width;
         game.global.towerHeight = tempTowerSection.height
@@ -73,7 +76,6 @@ gameState.prototype = {
         jumpButton = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
 
         if (!game.device.desktop) {
-            game.input.onDown.add(this.goFullScreen, this);
             // create our virtual game controller buttons
             //game, x, y, key, callback, callbackContext, overFrame, outFrame, downFrame, upFrame
             var btnSeparation = game.width / 30;
@@ -103,6 +105,8 @@ gameState.prototype = {
             buttonright.events.onInputOut.add( function() { right = false; });
             buttonright.events.onInputDown.add(function() { right = true; });
             buttonright.events.onInputUp.add(  function() { right = false; });
+
+            game.input.onTap.add(this.gofull, this, null, 'onTap');
         }
     },
 
@@ -171,7 +175,11 @@ gameState.prototype = {
         // }
     },
 
-    goFullScreen: function() {
-        game.scale.startFullScreen(true);
+    gofull: function(pointer, event, msg) {
+        if (game.scale.isFullScreen) {
+            // game.scale.stopFullScreen();
+        } else {
+            game.scale.startFullScreen(false);
+        }
     }
 };
