@@ -29,10 +29,6 @@ gameState.prototype = {
     },
 
     create: function () {
-        // if (!game.device.desktop) {
-        //     game.input.onDown.add(this.goFullScreen, this);
-        // }
-
         game.global = {
             scaleFactor: 1,
             towerAngle: 0,
@@ -76,28 +72,38 @@ gameState.prototype = {
         cursors = game.input.keyboard.createCursorKeys();
         jumpButton = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
 
-        // create our virtual game controller buttons
-        buttonjump = game.add.button(game.width - 100, game.height/2, 'buttonjump', null, this, 0, 1, 0, 1);  //game, x, y, key, callback, callbackContext, overFrame, outFrame, downFrame, upFrame
-        buttonjump.fixedToCamera = true;  //our buttons should stay on the same place
-        buttonjump.events.onInputOver.add(function(){jump=true;});
-        buttonjump.events.onInputOut.add(function(){jump=false;});
-        buttonjump.events.onInputDown.add(function(){jump=true;});
-        buttonjump.events.onInputUp.add(function(){jump=false;});
+        if (!game.device.desktop) {
+            game.input.onDown.add(this.goFullScreen, this);
+            // create our virtual game controller buttons
+            //game, x, y, key, callback, callbackContext, overFrame, outFrame, downFrame, upFrame
+            var btnSeparation = game.width / 30;
+            buttonjump = game.add.button(0, game.height/2, 'buttonjump', null, this, 0, 1, 0, 1);
+            buttonjump.scale.setTo(2);
+            buttonjump.x = game.width - btnSeparation - buttonjump.width;
+            buttonjump.fixedToCamera = true;  //our buttons should stay on the same place
+            buttonjump.events.onInputOver.add(function() { jump = true; });
+            buttonjump.events.onInputOut.add( function() { jump = false; });
+            buttonjump.events.onInputDown.add(function() { jump = true; });
+            buttonjump.events.onInputUp.add(  function() { jump = false; });
 
-        buttonleft = game.add.button(10, game.height/2, 'buttonhorizontal', null, this, 0, 1, 0, 1);
-        buttonleft.fixedToCamera = true;
-        buttonleft.events.onInputOver.add(function(){left=true;});
-        buttonleft.events.onInputOut.add(function(){left=false;});
-        buttonleft.events.onInputDown.add(function(){left=true;});
-        buttonleft.events.onInputUp.add(function(){left=false;});
+            buttonleft = game.add.button(0, game.height/2, 'buttonhorizontal', null, this, 0, 1, 0, 1);
+            buttonleft.scale.setTo(2);
+            buttonleft.x = btnSeparation;
+            buttonleft.fixedToCamera = true;
+            buttonleft.events.onInputOver.add(function() {left = true; });
+            buttonleft.events.onInputOut.add( function() {left = false; });
+            buttonleft.events.onInputDown.add(function() {left = true; });
+            buttonleft.events.onInputUp.add(  function() {left = false; });
 
-        buttonright = game.add.button(160, game.height/2, 'buttonhorizontal', null, this, 0, 1, 0, 1);
-        buttonright.fixedToCamera = true;
-        buttonright.events.onInputOver.add(function(){right=true;});
-        buttonright.events.onInputOut.add(function(){right=false;});
-        buttonright.events.onInputDown.add(function(){right=true;});
-        buttonright.events.onInputUp.add(function(){right=false;});
-
+            buttonright = game.add.button(0, game.height/2, 'buttonhorizontal', null, this, 0, 1, 0, 1);
+            buttonright.scale.setTo(2);
+            buttonright.x = buttonleft.width + btnSeparation * 2;
+            buttonright.fixedToCamera = true;
+            buttonright.events.onInputOver.add(function() { right = true; });
+            buttonright.events.onInputOut.add( function() { right = false; });
+            buttonright.events.onInputDown.add(function() { right = true; });
+            buttonright.events.onInputUp.add(  function() { right = false; });
+        }
     },
 
     render: function() {},
