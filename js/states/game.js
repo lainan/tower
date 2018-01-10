@@ -12,6 +12,8 @@ var gameState = function () {
     var cursors;
     var jumpTimer;
 
+    var test;
+
     var pad1;
     var left, right, jump;
 
@@ -34,7 +36,7 @@ gameState.prototype = {
         game.global = {
             scaleFactor: 1,
             towerAngle: 0,
-            bmd: game.make.bitmapData(220, 220)
+            bmd: game.make.bitmapData(100, 100)
         };
         var tempTowerSection = new TowerSection(game, 0, 0);
         game.global.towerWidth = tempTowerSection.width;
@@ -47,18 +49,24 @@ gameState.prototype = {
         left = right = jump = false;
 
         game.stage.setBackgroundColor('4488AA');
-        game.world.setBounds(0, 0, screenWidth, screenHeight * 1);
+        game.world.setBounds(0, 0, screenWidth, screenHeight * 2);
 
         background = new Background(game);
 
         tower = new Tower(game);
         plataforms = game.add.group();
+        shadows = game.add.group();
 
-        for (var i = 0; i < 20; i++) {
-            plataforms.add(new Plataform(game, (i * 52) % 359, (i * 40)));
+        for (var i = 0; i < 25; i++) {
+            plataforms.add(new Plataform(game, (i * 54) % 359, 300 + (i * 40)));
+            shadows.add(new Shadow(game, plataforms.getAt(i), 220, -10));
         }
 
+        game.world.bringToTop(plataforms);
+
         player = new Player(game, game.world.centerX, game.world.height - 50);
+
+        // test = new Shadow(game, plataforms.getAt(24));
 
         game.camera.follow(player);
         game.camera.x = game.world.centerX;
@@ -105,6 +113,7 @@ gameState.prototype = {
             tower.updateState();
             background.move('left');
             plataforms.callAll('updateState', null);
+            shadows.callAll('updateState', null);
             plataforms.sort('depth', Phaser.Group.SORT_ASCENDING);
         }
         else if (cursors.right.isDown || right) {
@@ -116,6 +125,7 @@ gameState.prototype = {
             tower.updateState();
             background.move('right');
             plataforms.callAll('updateState', null);
+            shadows.callAll('updateState', null);
             plataforms.sort('depth', Phaser.Group.SORT_ASCENDING);
         }
 
