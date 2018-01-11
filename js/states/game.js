@@ -24,23 +24,17 @@ gameState.prototype = {
     init: function () {},
 
     preload: function () {
-        game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-        game.scale.fullScreenScaleMode = Phaser.ScaleManager.EXACT_FIT;
+        this.generateTextureShadow('plataform');
     },
 
     create: function () {
-        game.scale.fullScreenScaleMode = Phaser.ScaleManager.EXACT_FIT;
-
         game.global = {
             scaleFactor: 1,
             towerAngle: 0,
+            towerWidth: game.cache.getFrameByIndex('tower', 1).width,
+            towerHeight: game.cache.getFrameByIndex('tower', 1).height,
             bmd: game.make.bitmapData(100, 100)
         };
-
-        var tempTowerSection = new TowerSection(game, 0, 0);
-        game.global.towerWidth = tempTowerSection.width;
-        game.global.towerHeight = tempTowerSection.height
-        tempTowerSection.destroy();
 
         game.input.gamepad.start();
         pad1 = game.input.gamepad.pad1;
@@ -51,16 +45,15 @@ gameState.prototype = {
         game.world.setBounds(0, 0, screenWidth, screenHeight * 2);
 
         background = new Background(game);
-
         tower = new Tower(game);
+
         plataforms = game.add.group();
         shadows = game.add.group();
         var platformSeparation = 40;
         for (var i = 0; i < ((game.world.bounds.height - 300) / platformSeparation); i++) {
             plataforms.add(new Plataform(game, (i * 54) % 359, 300 + (i * platformSeparation)));
-            shadows.add(new Shadow(game, plataforms.getAt(i), 220, -10));
+            shadows.add(new Shadow(game, plataforms.getAt(i), null, -10));
         }
-
         game.world.bringToTop(plataforms);
 
         player = new Player(game, game.world.centerX, game.world.height - 50);
@@ -106,7 +99,7 @@ gameState.prototype = {
             buttonright.events.onInputDown.add(function() { right = true; });
             buttonright.events.onInputUp.add(  function() { right = false; });
 
-            game.input.onTap.add(this.gofull, this, null, 'onTap');
+            game.input.onTap.add(this.goFullScreen, this, null, 'onTap');
         }
     },
 
@@ -114,7 +107,11 @@ gameState.prototype = {
 
     update: function () {
         // Keyboard
-        if (cursors.left.isDown || left) {
+        if (cursors.left.isDown ||
+            left ||
+            pad1.isDown(Phaser.Gamepad.XBOX360_DPAD_LEFT) ||
+            pad1.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X) < -0.1
+        ) {
             if (game.global.towerAngle === 358) {
                 game.global.towerAngle = 0;
             } else {
@@ -126,7 +123,11 @@ gameState.prototype = {
             shadows.callAll('updateState', null);
             plataforms.sort('depth', Phaser.Group.SORT_ASCENDING);
         }
-        else if (cursors.right.isDown || right) {
+        else if (cursors.right.isDown ||
+            right ||
+            pad1.isDown(Phaser.Gamepad.XBOX360_DPAD_RIGHT) ||
+            pad1.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X)
+        ) {
             if (game.global.towerAngle === 0) {
                 game.global.towerAngle = 358;
             } else {
@@ -139,7 +140,11 @@ gameState.prototype = {
             plataforms.sort('depth', Phaser.Group.SORT_ASCENDING);
         }
 
-        if ((jump || jumpButton.isDown) && game.time.now > jumpTimer && player.checkIfCanJump()) {
+        if ((jumpButton.isDown ||
+            jump ||
+            pad1.justPressed(Phaser.Gamepad.XBOX360_A)) &&
+            (game.time.now > jumpTimer && player.checkIfCanJump())
+        ) {
             player.jump();
             jumpTimer = game.time.now + 100;
         }
@@ -150,36 +155,37 @@ gameState.prototype = {
             left = false;
             jump = false;
         }
-
-        // Controller
-        // if (pad1.isDown(Phaser.Gamepad.XBOX360_DPAD_LEFT) || pad1.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X) < -0.1) {
-        //     plataforms.callAll('move', null, 'left');
-        //     tower.updateAnimation('left');
-        // }
-        // else if (pad1.isDown(Phaser.Gamepad.XBOX360_DPAD_RIGHT) || pad1.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X) > 0.1) {
-        //     plataforms.callAll('move', null, 'right');
-        //     tower.updateAnimation('right');
-        // }
-        //
-        // if (pad1.isDown(Phaser.Gamepad.XBOX360_DPAD_UP) || pad1.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_Y) < -0.1) {
-        // }
-        // else if (pad1.isDown(Phaser.Gamepad.XBOX360_DPAD_DOWN) || pad1.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_Y) > 0.1) {
-        // }
-        //
-        // if (pad1.justPressed(Phaser.Gamepad.XBOX360_A)) {
-        //     player.body.moveUp(300);
-        // }
-        //
-        // if (pad1.justReleased(Phaser.Gamepad.XBOX360_B)) {
-        //
-        // }
     },
 
-    gofull: function(pointer, event, msg) {
+    goFullScreen: function(pointer, event, msg) {
         if (game.scale.isFullScreen) {
             // game.scale.stopFullScreen();
         } else {
             game.scale.startFullScreen(false);
         }
+    },
+
+    generateTextureShadow: function(casterKey, shadowSize) {
+        if (shadowSize === undefined) {
+            var frontView = game.cache.getFrameByName(casterKey, '0000');
+            shadowSize = Math.max(frontView.width, frontView.height) * 3;
+        }
+
+        var shadowKey = casterKey + '-shadow';
+        var bmd = game.make.bitmapData(shadowSize, shadowSize);
+        var shadowRadius = (shadowSize / 2);
+        var innerCircle = new Phaser.Circle(shadowRadius, shadowRadius, 1);
+        var outerCircle = new Phaser.Circle(shadowRadius, shadowRadius, shadowRadius);
+        var grd = bmd.context.createRadialGradient(
+            innerCircle.x, innerCircle.y, innerCircle.radius,
+            outerCircle.x, outerCircle.y, outerCircle.radius);
+        grd.addColorStop(0, 'rgba(0,0,0,1)');
+        grd.addColorStop(1, 'rgba(0,0,0,0.0)');
+        bmd.cls();
+        bmd.circle(outerCircle.x, outerCircle.y, outerCircle.radius, grd);
+        // bmd.generateTexture(shadowKey);
+        // bmd.destroy();
+
+        this.load.imageFromBitmapData(shadowKey, bmd);
     }
 };

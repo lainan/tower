@@ -1,32 +1,20 @@
 /* global Phaser */
 
-var Shadow = function (game, parentObject, shadowSize, offset = 0) {
-    this.parentObject = parentObject;
+var Shadow = function(game, caster, shadowSize, offset = 0) {
     if (shadowSize) {
         this.shadowSize = shadowSize;
     } else {
-        this.shadowSize = Math.max(parentObject.width, parentObject.height) * 3;
+        var frontView = game.cache.getFrameByName(caster.key, '0000');
+        this.shadowSize = Math.max(frontView.width, frontView.height) * 3;
     }
-    game.global.bmd = game.make.bitmapData(this.shadowSize, this.shadowSize);
-    this.shadowRadius = (this.shadowSize / 2);
-    var innerCircle = new Phaser.Circle(this.shadowRadius, this.shadowRadius, 1);
-    var outerCircle = new Phaser.Circle(this.shadowRadius, this.shadowRadius, this.shadowRadius);
-    var grd = game.global.bmd.context.createRadialGradient(
-      innerCircle.x,
-      innerCircle.y,
-      innerCircle.radius,
-      outerCircle.x,
-      outerCircle.y,
-      outerCircle.radius);
-    grd.addColorStop(0, 'rgba(0,0,0,0.4)');
-    grd.addColorStop(1, 'rgba(0,0,0,0)');
-    game.global.bmd.cls();
-    game.global.bmd.circle(outerCircle.x, outerCircle.y, outerCircle.radius, grd);
+    // game.global.bmd.destroy();
+    var shadowTextureKey = caster.key + '-shadow';
+    console.log(shadowTextureKey, game.cache.checkImageKey(shadowTextureKey));
 
-    Phaser.Sprite.call(this, game, game.world.centerX, parentObject.y + offset, game.global.bmd);
+    Phaser.Sprite.call(this, game, game.world.centerX, caster.y + offset, game.cache.getImage(shadowTextureKey));
     this.anchor.setTo(0.5);
 
-    this.angleOffset = parentObject.angleOffset;
+    this.angleOffset = caster.angleOffset;
     this.angleFinal = this.angleOffset;
 
     this.updateState();
