@@ -63,10 +63,7 @@ gameState.prototype = {
         game.physics.p2.gravity.y = 1200;
 
         cursors = game.input.keyboard.createCursorKeys();
-        jumpButton = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
-        jumpButton.wasReleased = true;
-        jumpButton.onDown.add(function() { jumpButton.wasReleased = false; });
-        jumpButton.onUp.add(function() { jumpButton.wasReleased = true; });
+        jumpButton = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);;
 
         if (!game.device.desktop) {
             // create our virtual game controller buttons
@@ -140,15 +137,14 @@ gameState.prototype = {
             platforms.sort('depth', Phaser.Group.SORT_ASCENDING);
         }
 
-        if ((jumpButton.isDown ||
+        if ((jumpButton.justDown ||
             jump ||
             pad1.justPressed(Phaser.Gamepad.XBOX360_A)) &&
             (game.time.now > jumpTimer) &&
-            jumpButton.wasReleased &&
             player.checkIfCanJump()
         ) {
             player.jump();
-            jumpTimer = game.time.now + 100;
+            jumpTimer = game.time.now + 1;
         }
 
         // Virtual controller
