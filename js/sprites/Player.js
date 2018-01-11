@@ -28,14 +28,11 @@ Player.prototype.checkIfCanJump = function() {
 
     for (var i = 0; i < this.game.physics.p2.world.narrowphase.contactEquations.length; i++) {
         var c = this.game.physics.p2.world.narrowphase.contactEquations[i];
-
         if (c.bodyA === this.body.data || c.bodyB === this.body.data) {
             var d = p2.vec2.dot(c.normalA, this.yAxis);
-
             if (c.bodyA === this.body.data) {
                 d *= -1;
             }
-
             if (d > 0.5) {
                 result = true;
             }

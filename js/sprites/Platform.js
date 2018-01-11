@@ -1,7 +1,7 @@
 /* global Phaser */
 
-var Plataform = function (game, angleOffset, y = game.world.centerY) {
-    Phaser.Sprite.call(this, game, game.world.centerX, y, 'plataform');
+var Platform = function (game, angleOffset, y = game.world.centerY) {
+    Phaser.Sprite.call(this, game, game.world.centerX, y, 'platform');
     this.anchor.setTo(0.5);
     this.depth = 0;
 
@@ -11,7 +11,7 @@ var Plataform = function (game, angleOffset, y = game.world.centerY) {
     this.angleFinal = this.angleOffset;
     // Physics
     // this.body.clearShapes();
-    // this.body.loadPolygon('physicsData', 'plataform');
+    // this.body.loadPolygon('physicsData', 'platform');
     this.frameName = '0000';
     game.physics.p2.enable(this, false);
     this.body.static = true;
@@ -20,10 +20,10 @@ var Plataform = function (game, angleOffset, y = game.world.centerY) {
     game.add.existing(this);
 };
 
-Plataform.prototype = Object.create(Phaser.Sprite.prototype);
-Plataform.prototype.constructor = Plataform;
+Platform.prototype = Object.create(Phaser.Sprite.prototype);
+Platform.prototype.constructor = Platform;
 
-Plataform.prototype.updateLocation = function() {
+Platform.prototype.updateLocation = function() {
     this.body.x = this.game.world.centerX + (this.pivotRadius * Math.sin(this.angleFinal * Math.PI / 180));
     if (this.angleFinal.between(91, 136)) {
         this.body.x = this.game.world.centerX + (this.pivotRadius * Math.sin(90 * Math.PI / 180));
@@ -32,7 +32,7 @@ Plataform.prototype.updateLocation = function() {
     }
 };
 
-Plataform.prototype.updateFrame = function() {
+Platform.prototype.updateFrame = function() {
     if (this.angleFinal.between(0, 131)) {
         this.scale.x = 1;
         this.frameName  = (this.angleFinal).pad(4);
@@ -45,7 +45,7 @@ Plataform.prototype.updateFrame = function() {
     }
 };
 
-Plataform.prototype.updateState = function() {
+Platform.prototype.updateState = function() {
     this.angleFinal = (this.angleOffset + this.game.global.towerAngle) % 360;
     this.updateLocation();
     this.updateFrame();

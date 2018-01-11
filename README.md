@@ -1,3 +1,3 @@
 # tower
 
-Side-scrolling plataformer with roguelike elements.
+Side-scrolling platformer with roguelike elements.

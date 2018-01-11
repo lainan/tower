@@ -1,11 +1,11 @@
-/* global Phaser, game, Plataform, Tower */
+/* global Phaser, game, Platform, Tower */
 /* eslint-disable */
 // eslint-disable-next-line no-unused-vars
 var gameState = function () {
     var background;
 
     var tower;
-    var plataforms;
+    var platforms;
     var shadows;
     var player;
 
@@ -16,26 +16,22 @@ var gameState = function () {
 
     var pad1;
     var left, right, jump;
-
-    var bmd;
 };
 
 gameState.prototype = {
     init: function () {},
 
     preload: function () {
-        this.generateTextureShadow('plataform');
-    },
-
-    create: function () {
         game.global = {
             scaleFactor: 1,
             towerAngle: 0,
             towerWidth: game.cache.getFrameByIndex('tower', 1).width,
             towerHeight: game.cache.getFrameByIndex('tower', 1).height,
-            bmd: game.make.bitmapData(100, 100)
         };
+        this.generateTextureShadow('platform');
+    },
 
+    create: function () {
         game.input.gamepad.start();
         pad1 = game.input.gamepad.pad1;
         jumpTimer = 0;
@@ -47,18 +43,19 @@ gameState.prototype = {
         background = new Background(game);
         tower = new Tower(game);
 
-        plataforms = game.add.group();
+        platforms = game.add.group();
         shadows = game.add.group();
         var platformSeparation = 40;
         for (var i = 0; i < ((game.world.bounds.height - 300) / platformSeparation); i++) {
-            plataforms.add(new Plataform(game, (i * 54) % 359, 300 + (i * platformSeparation)));
-            shadows.add(new Shadow(game, plataforms.getAt(i), null, -10));
+            platforms.add(new Platform(game, (i * 54) % 359, 300 + (i * platformSeparation)));
+            shadows.add(new Shadow(game, platforms.getAt(i), null, -10));
         }
-        game.world.bringToTop(plataforms);
+        game.world.bringToTop(platforms);
+
 
         player = new Player(game, game.world.centerX, game.world.height - 50);
 
-        // test = new Shadow(game, plataforms.getAt(24));
+        // test = new Shadow(game, platforms.getAt(24));
 
         game.camera.follow(player);
         game.camera.x = game.world.centerX;
@@ -67,6 +64,9 @@ gameState.prototype = {
 
         cursors = game.input.keyboard.createCursorKeys();
         jumpButton = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+        jumpButton.wasReleased = true;
+        jumpButton.onDown.add(function() { jumpButton.wasReleased = false; });
+        jumpButton.onUp.add(function() { jumpButton.wasReleased = true; });
 
         if (!game.device.desktop) {
             // create our virtual game controller buttons
@@ -119,9 +119,9 @@ gameState.prototype = {
             }
             tower.updateState();
             background.move('left');
-            plataforms.callAll('updateState', null);
+            platforms.callAll('updateState', null);
             shadows.callAll('updateState', null);
-            plataforms.sort('depth', Phaser.Group.SORT_ASCENDING);
+            platforms.sort('depth', Phaser.Group.SORT_ASCENDING);
         }
         else if (cursors.right.isDown ||
             right ||
@@ -135,15 +135,17 @@ gameState.prototype = {
             }
             tower.updateState();
             background.move('right');
-            plataforms.callAll('updateState', null);
+            platforms.callAll('updateState', null);
             shadows.callAll('updateState', null);
-            plataforms.sort('depth', Phaser.Group.SORT_ASCENDING);
+            platforms.sort('depth', Phaser.Group.SORT_ASCENDING);
         }
 
         if ((jumpButton.isDown ||
             jump ||
             pad1.justPressed(Phaser.Gamepad.XBOX360_A)) &&
-            (game.time.now > jumpTimer && player.checkIfCanJump())
+            (game.time.now > jumpTimer) &&
+            jumpButton.wasReleased &&
+            player.checkIfCanJump()
         ) {
             player.jump();
             jumpTimer = game.time.now + 100;
@@ -172,20 +174,21 @@ gameState.prototype = {
         }
 
         var shadowKey = casterKey + '-shadow';
-        var bmd = game.make.bitmapData(shadowSize, shadowSize);
+        var bmd = game.add.bitmapData(shadowSize, shadowSize);
         var shadowRadius = (shadowSize / 2);
         var innerCircle = new Phaser.Circle(shadowRadius, shadowRadius, 1);
         var outerCircle = new Phaser.Circle(shadowRadius, shadowRadius, shadowRadius);
         var grd = bmd.context.createRadialGradient(
             innerCircle.x, innerCircle.y, innerCircle.radius,
             outerCircle.x, outerCircle.y, outerCircle.radius);
-        grd.addColorStop(0, 'rgba(0,0,0,1)');
+        grd.addColorStop(0, 'rgba(0,0,0,0.4)');
         grd.addColorStop(1, 'rgba(0,0,0,0.0)');
         bmd.cls();
         bmd.circle(outerCircle.x, outerCircle.y, outerCircle.radius, grd);
+        game.cache.addBitmapData(shadowKey, bmd);
         // bmd.generateTexture(shadowKey);
+        // game.global[shadowKey]
+        // this.load.imageFromBitmapData(shadowKey, bmd);
         // bmd.destroy();
-
-        this.load.imageFromBitmapData(shadowKey, bmd);
     }
 };

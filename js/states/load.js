@@ -16,7 +16,7 @@ var loadState = {
 
         game.load.image('background', 'assets/sprites/background.png');
         game.load.spritesheet('tower', 'assets/sprites/tower.png', 798, 132, 360);
-        this.game.load.atlas('plataform', 'assets/sprites/plataform.png', 'assets/sprites/plataform.json');
+        this.game.load.atlas('platform', 'assets/sprites/platform.png', 'assets/sprites/platform.json');
 
         game.load.physics('physicsData', 'assets/physics/sprites.json');
 
