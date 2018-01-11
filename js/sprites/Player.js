@@ -9,6 +9,10 @@ var Player = function (game, x, y) {
     game.physics.p2.enable(this, false);
     this.body.fixedRotation = true;
 
+    this.jumpCount = 0;
+    this.maxJumps = 1;
+    this.jumpTimer = game.time.now;
+
     game.add.existing(this);
 };
 
@@ -20,12 +24,18 @@ Player.prototype.update = function() {
 };
 
 Player.prototype.jump = function() {
-    this.body.moveUp(600);
+    if (this.isTouchingGorund() &&
+        this.jumpCount < this.maxJumps &&
+        this.jumpTimer < game.time.now
+    ) {
+        this.body.moveUp(600);
+        this.jumpTimer = game.time.now + 100;
+        this.jumpCount = 0; // += 1
+    }
 };
 
-Player.prototype.checkIfCanJump = function() {
+Player.prototype.isTouchingGorund = function() {
     var result = false;
-
     for (var i = 0; i < this.game.physics.p2.world.narrowphase.contactEquations.length; i++) {
         var c = this.game.physics.p2.world.narrowphase.contactEquations[i];
         if (c.bodyA === this.body.data || c.bodyB === this.body.data) {

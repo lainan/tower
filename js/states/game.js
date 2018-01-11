@@ -27,6 +27,7 @@ gameState.prototype = {
             towerAngle: 0,
             towerWidth: game.cache.getFrameByIndex('tower', 1).width,
             towerHeight: game.cache.getFrameByIndex('tower', 1).height,
+            inputBuffer: {}
         };
         this.generateTextureShadow('platform');
     },
@@ -137,14 +138,10 @@ gameState.prototype = {
             platforms.sort('depth', Phaser.Group.SORT_ASCENDING);
         }
 
-        if ((jumpButton.justDown ||
+        if (jumpButton.justPressed() ||
             jump ||
-            pad1.justPressed(Phaser.Gamepad.XBOX360_A)) &&
-            (game.time.now > jumpTimer) &&
-            player.checkIfCanJump()
-        ) {
+            pad1.justPressed(Phaser.Gamepad.XBOX360_A)) {
             player.jump();
-            jumpTimer = game.time.now + 1;
         }
 
         // Virtual controller
