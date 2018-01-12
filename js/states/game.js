@@ -27,7 +27,6 @@ gameState.prototype = {
             towerAngle: 0,
             towerWidth: game.cache.getFrameByIndex('tower', 1).width,
             towerHeight: game.cache.getFrameByIndex('tower', 1).height,
-            inputBuffer: {}
         };
         this.generateTextureShadow('platform');
     },
