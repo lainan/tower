@@ -27,6 +27,7 @@ gameState.prototype = {
             towerAngle: 0,
             towerWidth: game.cache.getFrameByIndex('tower', 1).width,
             towerHeight: game.cache.getFrameByIndex('tower', 1).height,
+            lastMove: 'none'
         };
         this.generateTextureShadow('platform');
     },
@@ -53,9 +54,9 @@ gameState.prototype = {
         game.world.bringToTop(platforms);
 
 
-        player = new Player(game, game.world.centerX, game.world.height - 50);
+        player = new Player(game, game.world.centerX, game.world.height - 150);
 
-        // test = new Shadow(game, platforms.getAt(24));
+        test = new MovingPlatform(game, 0, game.world.height- 50);
 
         game.camera.follow(player);
         game.camera.x = game.world.centerX;
@@ -114,11 +115,14 @@ gameState.prototype = {
             } else {
                 game.global.towerAngle = game.global.towerAngle + 1;
             }
+            game.global.lastMove = 'left';
             tower.updateState();
             background.move('left');
             platforms.callAll('updateState', null);
             shadows.callAll('updateState', null);
             platforms.sort('depth', Phaser.Group.SORT_ASCENDING);
+
+            test.updateState();
         }
         else if (cursors.right.isDown ||
             right ||
@@ -130,11 +134,14 @@ gameState.prototype = {
             } else {
                 game.global.towerAngle = game.global.towerAngle - 1;
             }
+            game.global.lastMove = 'right';
             tower.updateState();
             background.move('right');
             platforms.callAll('updateState', null);
             shadows.callAll('updateState', null);
             platforms.sort('depth', Phaser.Group.SORT_ASCENDING);
+
+            test.updateState();
         }
 
         if (jumpButton.justPressed() ||
