@@ -26,10 +26,10 @@ Player.prototype.update = function() {
 Player.prototype.jump = function() {
     if (this.isTouchingGorund() &&
         this.jumpCount < this.maxJumps &&
-        this.jumpTimer < game.time.now
+        this.jumpTimer < this.game.time.now
     ) {
         this.body.moveUp(600);
-        this.jumpTimer = game.time.now + 100;
+        this.jumpTimer = this.game.time.now + 100;
         this.jumpCount = 0; // += 1
     }
 };
