@@ -2,9 +2,13 @@
 
 var MovingPlatform = function (game, angleOffset, y = game.world.centerY) {
     Phaser.Sprite.call(this, game, game.world.centerX, y, 'platform');
-    this.frameCount = game.cache.getFrameCount('platform');
     this.anchor.setTo(0.5);
     this.depth = 0;
+
+    this.frameCount = game.cache.getFrameCount('platform');
+    this.lastVisibleAngleRight = this.frameCount - 2;
+    this.lastVisibleAngleLeft = 359 - (this.frameCount - 2);
+    this.invisibleFrame = this.frameCount - 1;
 
     this.frameName = '0090';
     this.pivotRadius = Math.floor((game.global.towerWidth + this.width) / 2);
@@ -17,8 +21,8 @@ var MovingPlatform = function (game, angleOffset, y = game.world.centerY) {
 
     this.movement = {
         currentAngle: 0,
-        finalAngle: 200,
-        angleSpeed: 20,
+        finalAngle: 40,
+        angleSpeed: 1,
         currentY: 0,
         finalY: 0,
         forward: true,

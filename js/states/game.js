@@ -56,7 +56,7 @@ gameState.prototype = {
 
         player = new Player(game, game.world.centerX, game.world.height - 150);
 
-        test = new MovingPlatform(game, 0, game.world.height- 50);
+        test = new MovingPlatform(game, 340, game.world.height- 50);
 
         game.camera.follow(player);
         game.camera.x = game.world.centerX;
@@ -108,8 +108,7 @@ gameState.prototype = {
         if (cursors.left.isDown ||
             left ||
             pad1.isDown(Phaser.Gamepad.XBOX360_DPAD_LEFT) ||
-            pad1.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X) < -0.1
-        ) {
+            pad1.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X) < -0.1) {
             if (game.global.towerAngle === 358) {
                 game.global.towerAngle = 0;
             } else {
@@ -127,8 +126,7 @@ gameState.prototype = {
         else if (cursors.right.isDown ||
             right ||
             pad1.isDown(Phaser.Gamepad.XBOX360_DPAD_RIGHT) ||
-            pad1.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X)
-        ) {
+            pad1.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X)) {
             if (game.global.towerAngle === 0) {
                 game.global.towerAngle = 358;
             } else {
@@ -173,7 +171,7 @@ gameState.prototype = {
         }
 
         var shadowKey = casterKey + '-shadow';
-        var bmd = game.add.bitmapData(shadowSize, shadowSize);
+        var bmd = game.make.bitmapData(shadowSize, shadowSize);
         var shadowRadius = (shadowSize / 2);
         var innerCircle = new Phaser.Circle(shadowRadius, shadowRadius, 1);
         var outerCircle = new Phaser.Circle(shadowRadius, shadowRadius, shadowRadius);

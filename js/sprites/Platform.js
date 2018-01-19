@@ -2,9 +2,13 @@
 
 var Platform = function (game, angleOffset, y = game.world.centerY) {
     Phaser.Sprite.call(this, game, game.world.centerX, y, 'platform');
-    this.frameCount = game.cache.getFrameCount('platform');
     this.anchor.setTo(0.5);
     this.depth = 0;
+
+    this.frameCount = game.cache.getFrameCount('platform');
+    this.lastVisibleAngleRight = this.frameCount - 2;
+    this.lastVisibleAngleLeft = 359 - (this.frameCount - 2);
+    this.invisibleFrame = this.frameCount - 1;
 
     this.frameName = '0090';
     this.pivotRadius = Math.floor((game.global.towerWidth + this.width) / 2);
@@ -35,14 +39,14 @@ Platform.prototype.updateLocation = function() {
 };
 
 Platform.prototype.updateFrame = function() {
-    if (this.angleFinal.between(0, this.frameCount-2)) {
+    if (this.angleFinal.between(0, this.lastVisibleAngleRight)) {
         this.scale.x = 1;
         this.frameName  = (this.angleFinal).pad(4);
-    } else if (this.angleFinal.between(359 - (this.frameCount-2), 359)) {
+    } else if (this.angleFinal.between(this.lastVisibleAngleLeft, 359)) {
         this.scale.x = -1;
         this.frameName  = (359 - this.angleFinal).pad(4);
     } else {
-        this.frameName = (this.frameCount-1).pad(4);
+        this.frameName = (this.invisibleFrame).pad(4);
         this.body.x = this.game.world.centerX + (this.pivotRadius * Math.sin(90 * Math.PI / 180));
     }
 };
