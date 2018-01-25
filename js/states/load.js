@@ -6,7 +6,7 @@ var loadState = {
         var loadingLabel = game.add.text(80, 150, 'loading...', {font: '30px Courier', fill: '#ffffff'});
         loadingLabel.anchor.setTo(0.5, 0.5);
 
-        //Load your images, spritesheets, bitmaps...
+        // IMAGES
         game.load.image('game-logo', './assets/sprites/logo.png');
         game.load.image('mushroom', 'assets/sprites/mushroom.png');
 
@@ -18,6 +18,9 @@ var loadState = {
         game.load.spritesheet('tower', 'assets/sprites/tower.png', 798, 132, 360);
         this.game.load.atlas('platform', 'assets/sprites/platform.png', 'assets/sprites/platform.json');
 
+        game.load.image('spark', 'assets/sprites/spark-particle.png');
+
+        // DATA
         game.load.physics('physicsData', 'assets/physics/sprites.json');
 
         //Load your sounds, efx, music...

@@ -12,7 +12,9 @@ var gameState = function () {
     var cursors;
     var jumpTimer;
 
+    var emitter
     var test;
+    var timer;
 
     var pad1;
     var left, right, jump;
@@ -56,7 +58,15 @@ gameState.prototype = {
 
         player = new Player(game, game.world.centerX, game.world.height - 150);
 
-        test = new MovingPlatform(game, 340, game.world.height- 50);
+        test = new MovingPlatform(game, 0, game.world.height- 50);
+
+        emitter = game.add.emitter(0, 0, 50);
+        emitter.makeParticles('spark');
+        emitter.gravity = 200;
+        emitter.minParticleScale = 0.1;
+        emitter.maxParticleScale = 0.6;
+        emitter.start(false, 150, 1);
+
 
         game.camera.follow(player);
         game.camera.x = game.world.centerX;
@@ -120,8 +130,6 @@ gameState.prototype = {
             platforms.callAll('updateState', null);
             shadows.callAll('updateState', null);
             platforms.sort('depth', Phaser.Group.SORT_ASCENDING);
-
-            test.updateState();
         }
         else if (cursors.right.isDown ||
             right ||
@@ -138,8 +146,6 @@ gameState.prototype = {
             platforms.callAll('updateState', null);
             shadows.callAll('updateState', null);
             platforms.sort('depth', Phaser.Group.SORT_ASCENDING);
-
-            test.updateState();
         }
 
         if (jumpButton.justPressed() ||
@@ -154,6 +160,9 @@ gameState.prototype = {
             left = false;
             jump = false;
         }
+
+        emitter.x = test.x - 5;
+        emitter.y = test.y + 25;
     },
 
     goFullScreen: function(pointer, event, msg) {
@@ -188,4 +197,5 @@ gameState.prototype = {
         // this.load.imageFromBitmapData(shadowKey, bmd);
         // bmd.destroy();
     }
+
 };

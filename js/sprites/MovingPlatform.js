@@ -21,7 +21,7 @@ var MovingPlatform = function (game, angleOffset, y = game.world.centerY) {
 
     this.movement = {
         currentAngle: 0,
-        finalAngle: 40,
+        finalAngle: 90,
         angleSpeed: 1,
         currentY: 0,
         finalY: 0,
@@ -57,7 +57,7 @@ MovingPlatform.prototype.updateState = function() {
 
     this.movement.tick += 1;
 
-    this.angleFinal = (this.angleOffset + this.game.global.towerAngle + this.movement.currentAngle) % 360;
+    this.angleFinal = (this.angleOffset + this.movement.currentAngle + this.game.global.towerAngle) % 360;
     this.updateLocation();
     this.updateFrame();
     this.depth = Math.abs(this.angleFinal - 180);
