@@ -6,13 +6,13 @@ var gameState = function () {
 
     var tower;
     var platforms;
+    var movingplatforms;
     var shadows;
     var player;
 
     var cursors;
     var jumpTimer;
 
-    var test;
     var timer;
 
     var pad1;
@@ -47,12 +47,13 @@ gameState.prototype = {
 
         platforms = game.add.group();
         shadows = game.add.group();
-        this.createStairs(game.world.bounds.height - 400, game.world.bounds.height - 300, 30, 15);
+        //this.createStairs(game.world.bounds.height - 400, game.world.bounds.height - 300, 30, 15);
         game.world.bringToTop(platforms);
 
-        player = new Player(game, game.world.centerX, game.world.height - 150);
+        movingplatforms = game.add.group();
+        this.createMovingStairs(game.world.bounds.height - 900, game.world.bounds.height, 50, 15);
 
-        test = new MovingPlatform(game, 0, game.world.height- 50);
+        player = new Player(game, game.world.centerX, game.world.height - 150);
 
         game.camera.follow(player);
         game.camera.x = game.world.centerX;
@@ -182,9 +183,23 @@ gameState.prototype = {
     createStairs: function(startingPoint, endPoint, offsetY, offsetAngle) {
         var lenght = endPoint -startingPoint;
         for (var i = 0; i < (lenght / offsetY); i++) {
-            console.log(lenght, (endPoint / offsetY), i, startingPoint + (i * offsetY))
             platforms.add(new Platform(game, (i * offsetAngle) % 359, startingPoint + (i * offsetY)));
             shadows.add(new Shadow(game, platforms.getAt(i), null, -10));
+        }
+    },
+    createMovingStairs: function(startingPoint, endPoint, offsetY, offsetAngle) {
+        var lenght = endPoint -startingPoint;
+        for (var i = 0; i < (lenght / offsetY); i++) {
+            var movement = {
+                currentAngle: 0,
+                finalAngle: getRandomInt(15, 40),
+                angleSpeed: 3,
+                currentY: 0,
+                finalY: 0,
+                forward: true,
+                tick: 0
+            };
+            movingplatforms.add(new MovingPlatform(game, (i * offsetAngle) % 359, startingPoint + (i * offsetY), movement));
         }
     }
 

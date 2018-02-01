@@ -1,6 +1,6 @@
 /* global Phaser, Platform */
 
-var MovingPlatform = function (game, angleOffset, y = game.world.centerY) {
+var MovingPlatform = function (game, angleOffset, y = game.world.centerY, movement) {
     Phaser.Sprite.call(this, game, game.world.centerX, y, 'platform');
     this.anchor.setTo(0.5, 0.5);
     this.depth = 0;
@@ -18,16 +18,8 @@ var MovingPlatform = function (game, angleOffset, y = game.world.centerY) {
     this.frameName = '0000';
     game.physics.p2.enable(this, false);
     this.body.static = true;
-
-    this.movement = {
-        currentAngle: 0,
-        finalAngle: 90,
-        angleSpeed: 1,
-        currentY: 0,
-        finalY: 0,
-        forward: true,
-        tick: 0
-    };
+    console.log(movement);
+    this.movement = movement;
 
     this.sparks = {
         parent: this,
