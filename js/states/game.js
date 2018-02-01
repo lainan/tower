@@ -47,13 +47,8 @@ gameState.prototype = {
 
         platforms = game.add.group();
         shadows = game.add.group();
-        var platformSeparation = 40;
-        for (var i = 0; i < ((game.world.bounds.height - 300) / platformSeparation); i++) {
-            platforms.add(new Platform(game, (i * 54) % 359, 300 + (i * platformSeparation)));
-            shadows.add(new Shadow(game, platforms.getAt(i), null, -10));
-        }
+        this.createStairs(game.world.bounds.height - 400, game.world.bounds.height - 300, 30, 15);
         game.world.bringToTop(platforms);
-
 
         player = new Player(game, game.world.centerX, game.world.height - 150);
 
@@ -160,7 +155,6 @@ gameState.prototype = {
             game.scale.startFullScreen(false);
         }
     },
-
     generateTextureShadow: function(casterKey, shadowSize) {
         if (shadowSize === undefined) {
             var frontView = game.cache.getFrameByName(casterKey, '0000');
@@ -184,6 +178,14 @@ gameState.prototype = {
         // game.global[shadowKey]
         // this.load.imageFromBitmapData(shadowKey, bmd);
         // bmd.destroy();
+    },
+    createStairs: function(startingPoint, endPoint, offsetY, offsetAngle) {
+        var lenght = endPoint -startingPoint;
+        for (var i = 0; i < (lenght / offsetY); i++) {
+            console.log(lenght, (endPoint / offsetY), i, startingPoint + (i * offsetY))
+            platforms.add(new Platform(game, (i * offsetAngle) % 359, startingPoint + (i * offsetY)));
+            shadows.add(new Shadow(game, platforms.getAt(i), null, -10));
+        }
     }
 
 };

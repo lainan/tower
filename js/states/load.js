@@ -18,6 +18,8 @@ var loadState = {
         game.load.spritesheet('tower', 'assets/sprites/tower.png', 798, 132, 360);
         this.game.load.atlas('platform', 'assets/sprites/platform.png', 'assets/sprites/platform.json');
 
+
+        game.load.image('track', 'assets/sprites/track.png');
         game.load.image('spark', 'assets/sprites/spark-particle.png');
 
         // DATA
