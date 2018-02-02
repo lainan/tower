@@ -13,6 +13,6 @@ TowerSection.prototype.constructor = TowerSection;
 TowerSection.prototype.update = function() {};
 
 TowerSection.prototype.updateFrame = function() {
-    // this.frameName = (( this.game.global.towerAngle + this.frameOffset) % 45).pad(4);
-    this.frame = ((this.game.global.towerAngle + this.frameOffset) % 45);
+    // this.frameName = (( this.game.global.cameraAngle + this.frameOffset) % 45).pad(4);
+    this.frame = ((this.game.global.cameraAngle + this.frameOffset) % 45);
 };

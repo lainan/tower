@@ -64,7 +64,7 @@ Platform.prototype.updateFrame = function() {
 };
 
 Platform.prototype.updateState = function() {
-    this.angleFinal = (this.angleOffset + this.game.global.towerAngle) % 360;
+    this.angleFinal = (this.angleOffset + this.game.global.cameraAngle) % 360;
     this.updateLocation();
     this.updateFrame();
     this.depth = Math.abs(this.angleFinal - 180);

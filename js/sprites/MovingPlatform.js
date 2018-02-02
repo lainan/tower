@@ -86,7 +86,7 @@ MovingPlatform.prototype.updateState = function() {
 
     this.movement.tick += 1;
 
-    this.angleFinal = (this.angleOffset + this.movement.currentAngle + this.game.global.towerAngle) % 360;
+    this.angleFinal = (this.angleOffset + this.movement.currentAngle + this.game.global.cameraAngle) % 360;
     this.updateLocation();
     this.updateFrame();
     this.depth = Math.abs(this.angleFinal - 180);

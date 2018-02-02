@@ -25,7 +25,7 @@ gameState.prototype = {
     preload: function () {
         game.global = {
             scaleFactor: 1,
-            towerAngle: 0,
+            cameraAngle: 0,
             towerWidth: game.cache.getFrameByIndex('tower', 1).width,
             towerHeight: game.cache.getFrameByIndex('tower', 1).height,
             lastMove: 'none'
@@ -104,10 +104,10 @@ gameState.prototype = {
             left ||
             pad1.isDown(Phaser.Gamepad.XBOX360_DPAD_LEFT) ||
             pad1.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X) < -0.1) {
-            if (game.global.towerAngle === 358) {
-                game.global.towerAngle = 0;
+            if (game.global.cameraAngle === 358) {
+                game.global.cameraAngle = 0;
             } else {
-                game.global.towerAngle = game.global.towerAngle + 1;
+                game.global.cameraAngle = game.global.cameraAngle + 1;
             }
             game.global.lastMove = 'left';
             tower.updateState();
@@ -119,10 +119,10 @@ gameState.prototype = {
             right ||
             pad1.isDown(Phaser.Gamepad.XBOX360_DPAD_RIGHT) ||
             pad1.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X)) {
-            if (game.global.towerAngle === 0) {
-                game.global.towerAngle = 358;
+            if (game.global.cameraAngle === 0) {
+                game.global.cameraAngle = 358;
             } else {
-                game.global.towerAngle = game.global.towerAngle - 1;
+                game.global.cameraAngle = game.global.cameraAngle - 1;
             }
             game.global.lastMove = 'right';
             tower.updateState();
