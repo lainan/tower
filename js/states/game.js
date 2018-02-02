@@ -17,11 +17,11 @@ var gameState = function () {
 
     var pad1;
     var left, right, jump;
+    var levelGenerator;
 };
 
 gameState.prototype = {
-    init: function () {},
-
+    init: function () { },
     preload: function () {
         game.global = {
             scaleFactor: 1,
@@ -32,7 +32,6 @@ gameState.prototype = {
         };
         this.generateTextureShadow('platform');
     },
-
     create: function () {
         game.input.gamepad.start();
         pad1 = game.input.gamepad.pad1;
@@ -45,13 +44,14 @@ gameState.prototype = {
         background = new Background(game);
         tower = new Tower(game);
 
-        platforms = game.add.group();
         shadows = game.add.group();
-        //this.createStairs(game.world.bounds.height - 400, game.world.bounds.height - 300, 30, 15);
-        game.world.bringToTop(platforms);
+        platforms = game.add.group();
+        // this.createStairs(game.world.bounds.height - 400, game.world.bounds.height - 300, 30, 15);
+        // game.world.bringToTop(platforms);
 
         movingplatforms = game.add.group();
-        this.createMovingStairs(game.world.bounds.height - 900, game.world.bounds.height, 50, 15);
+        this.createMovingStairs(game.world.bounds.height - 400, game.world.bounds.height, 70, 15);
+        game.world.bringToTop(platforms);
 
         player = new Player(game, game.world.centerX, game.world.height - 150);
 
@@ -97,9 +97,7 @@ gameState.prototype = {
             game.input.onTap.add(this.goFullScreen, this, null, 'onTap');
         }
     },
-
     render: function() {},
-
     update: function () {
         // Keyboard
         if (cursors.left.isDown ||
@@ -115,7 +113,6 @@ gameState.prototype = {
             tower.updateState();
             background.move('left');
             platforms.callAll('updateState', null);
-            shadows.callAll('updateState', null);
             platforms.sort('depth', Phaser.Group.SORT_ASCENDING);
         }
         else if (cursors.right.isDown ||
@@ -131,7 +128,6 @@ gameState.prototype = {
             tower.updateState();
             background.move('right');
             platforms.callAll('updateState', null);
-            shadows.callAll('updateState', null);
             platforms.sort('depth', Phaser.Group.SORT_ASCENDING);
         }
 
@@ -199,6 +195,7 @@ gameState.prototype = {
                 tick: 0
             };
             movingplatforms.add(new MovingPlatform(game, (i * offsetAngle) % 359, startingPoint + (i * offsetY), movement));
+            shadows.add(new Shadow(game, movingplatforms.getAt(i), null, -10));
         }
     }
 

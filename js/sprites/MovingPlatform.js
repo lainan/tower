@@ -1,4 +1,4 @@
-/* global Phaser, Platform */
+/* global $, Phaser, Platform */
 
 var MovingPlatform = function (game, angleOffset, y = game.world.centerY, movement) {
     Phaser.Sprite.call(this, game, game.world.centerX, y, 'platform');
@@ -18,7 +18,6 @@ var MovingPlatform = function (game, angleOffset, y = game.world.centerY, moveme
     this.frameName = '0000';
     game.physics.p2.enable(this, false);
     this.body.static = true;
-    console.log(movement);
     this.movement = movement;
 
     this.sparks = {
@@ -67,7 +66,6 @@ var MovingPlatform = function (game, angleOffset, y = game.world.centerY, moveme
 MovingPlatform.prototype = Object.create(Platform.prototype);
 MovingPlatform.prototype.constructor = MovingPlatform;
 
-
 MovingPlatform.prototype.updateState = function() {
     if (this.movement.tick % this.movement.angleSpeed === 0) {
         if ((this.movement.currentAngle < this.movement.finalAngle) &&
@@ -94,6 +92,7 @@ MovingPlatform.prototype.updateState = function() {
     this.depth = Math.abs(this.angleFinal - 180);
 
     this.sparks.updateState();
+    this.updateShadow();
 };
 
 MovingPlatform.prototype.update = function() {

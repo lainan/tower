@@ -26,6 +26,18 @@ var Platform = function (game, angleOffset, y = game.world.centerY) {
 Platform.prototype = Object.create(Phaser.Sprite.prototype);
 Platform.prototype.constructor = Platform;
 
+
+Platform.prototype.linkShadow = function(shadow) {
+    this.shadow = shadow;
+};
+
+Platform.prototype.updateShadow = function() {
+    if (this.shadow !== undefined) {
+        this.shadow.updateState();
+    }
+};
+
+
 Platform.prototype.updateLocation = function() {
     this.body.x = this.game.world.centerX + (this.pivotRadius * Math.sin(this.angleFinal * Math.PI / 180));
     // Mantenemos el sprite en los bordes de la torre
@@ -56,4 +68,5 @@ Platform.prototype.updateState = function() {
     this.updateLocation();
     this.updateFrame();
     this.depth = Math.abs(this.angleFinal - 180);
+    this.updateShadow();
 };

@@ -9,8 +9,10 @@ var Shadow = function(game, caster, shadowSize, offset = 0) {
     this.angleOffset = caster.angleOffset;
     this.angleFinal = this.angleOffset;
 
-    this.updateState();
     game.add.existing(this);
+
+    this.updateState();
+    caster.linkShadow(this);
 };
 
 Shadow.prototype = Object.create(Phaser.Sprite.prototype);
