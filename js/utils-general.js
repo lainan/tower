@@ -41,6 +41,20 @@ String.prototype.format = function() {
     });
 };
 
+/**
+ * Devuelve el número en formato string con el tamaño dado,
+ * utilizando ceros como padding izquierdo
+ * @param  {[type]} size Tamaño mínimo de la cadena final
+ * @return {[type]}      Numero en formato string con el padding
+ */
+Number.prototype.pad = function(size) {
+    var s = String(this);
+    while (s.length < size) {
+        s = '0' + s;
+    }
+    return s;
+};
+
 
 // BÁSICO
 
