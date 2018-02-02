@@ -148,7 +148,6 @@ gameState.prototype = {
             jump = false;
         }
     },
-
     goFullScreen: function(pointer, event, msg) {
         if (game.scale.isFullScreen) {
             // game.scale.stopFullScreen();
