@@ -1,4 +1,4 @@
-/* global $, Phaser, Platform */
+/* global Phaser, Platform */
 
 var WormSection = function (game, angleOffset, y) {
     Phaser.Sprite.call(this, game, game.world.centerX, y, 'worm');

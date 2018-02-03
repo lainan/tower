@@ -1,4 +1,4 @@
-/* global Phaser, WormSection, getRandomInt */
+/* global Phaser, WormSection */
 
 var Worm = function (game, y, length) {
     Phaser.Group.call(this, game);

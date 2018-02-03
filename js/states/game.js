@@ -1,25 +1,7 @@
 /* global Phaser, game, Platform, Tower */
 /* eslint-disable */
 // eslint-disable-next-line no-unused-vars
-var gameState = function () {
-    var background;
-
-    var tower;
-    var platforms;
-    var movingplatforms;
-    var shadows;
-    var player;
-
-    var cursors;
-    var jumpTimer;
-    var worm;
-
-    var timer;
-
-    var pad1;
-    var left, right, jump;
-    var levelGenerator;
-};
+var gameState = function () { };
 
 gameState.prototype = {
     init: function () { },
@@ -39,145 +21,139 @@ gameState.prototype = {
         this.generateTextureShadow('worm');
     },
     create: function () {
-        game.input.gamepad.start();
-        pad1 = game.input.gamepad.pad1;
-        jumpTimer = 0;
-        left = right = jump = false;
-
         game.stage.setBackgroundColor('4488AA');
         game.world.setBounds(0, 0, screenWidth, screenHeight * 2);
 
-        background = new Background(game);
-        tower = new Tower(game);
+        this.background = new Background(game);
+        this.tower = new Tower(game);
 
-        shadows = game.add.group();
-        platforms = game.add.group();
+        this.shadows = game.add.group();
+        this.platforms = game.add.group();
         var t = this.createStairs(game.world.bounds.height - 800, game.world.bounds.height - 400, 70, 0, 15);
 
-        movingplatforms = game.add.group();
+        this.movingplatforms = game.add.group();
         this.createMovingStairs(game.world.bounds.height - 400, game.world.bounds.height, 70, Math.floor(t) + 15, 15);
 
-        // worm = game.add.group();
-        // worm = new WormSection(game, 0, game.world.bounds.height - 100);
-        worm = new Worm(game, game.world.bounds.height - 100, 10);
-        worm.forEach(function(wormSection) {
-            shadows.add(new Shadow(game, wormSection, -10));
-        });
 
-        game.world.bringToTop(shadows);
+        this.worm = new Worm(game, game.world.bounds.height - 100, 10);
+        this.worm.forEach(function(wormSection) {
+            this.shadows.add(new Shadow(game, wormSection, -10));
+        }, this);
+
+        game.world.bringToTop(this.shadows);
         game.world.bringToTop(game.global.sparksGroup);
-        game.world.bringToTop(movingplatforms);
-        game.world.bringToTop(platforms);
+        game.world.bringToTop(this.movingplatforms);
+        game.world.bringToTop(this.platforms);
         game.world.bringToTop(game.global.dustGroup);
-        game.world.bringToTop(worm);
+        game.world.bringToTop(this.worm);
 
-        // for (var i = 0; i < 10; i++) {
-        //     worm.add(new Worm(
-        //         game,
-        //         0 +  (i * 10) % 359,
-        //         game.world.bounds.height - 100,
-        //         wormMovement)
-        //     );
-        //     // shadows.add(new Shadow(game, movingplatforms.getAt(i), -10));
-        // }
-
-        player = new Player(game, game.world.centerX, game.world.height - 150);
-
-        game.camera.follow(player);
+        this.player = new Player(game, game.world.centerX, game.world.height - 150);
+        game.camera.follow(this.player);
         game.camera.x = game.world.centerX;
         game.camera.y = game.world.centerY - 500;
         game.physics.p2.gravity.y = 1200;
 
-        cursors = game.input.keyboard.createCursorKeys();
-        jumpButton = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);;
+
+        // CONTROLES
+        // Teclado
+        this.keyboard = {
+            a:  game.input.keyboard.addKey(Phaser.Keyboard.A),
+            d: game.input.keyboard.addKey(Phaser.Keyboard.D),
+            left:  game.input.keyboard.addKey(Phaser.Keyboard.LEFT),
+            right: game.input.keyboard.addKey(Phaser.Keyboard.RIGHT),
+            jump: game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR)
+        };
+        // Virtual
+        this.virtual = {
+            left: false,
+            right: false,
+            jump: false,
+        }
+        // Mando XBOX
+        game.input.gamepad.start();
+        this.gamepad = game.input.gamepad.pad1;
 
         if (!game.device.desktop) {
-            // create our virtual game controller buttons
-            //game, x, y, key, callback, callbackContext, overFrame, outFrame, downFrame, upFrame
+            // Creación de botones virtuales para móbiles
             var btnSeparation = game.width / 30;
-            buttonjump = game.add.button(0, game.height/2, 'buttonjump', null, this, 0, 1, 0, 1);
-            buttonjump.scale.setTo(2);
-            buttonjump.x = game.width - btnSeparation - buttonjump.width;
-            buttonjump.fixedToCamera = true;  //our buttons should stay on the same place
-            buttonjump.events.onInputOver.add(function() { jump = true; });
-            buttonjump.events.onInputOut.add( function() { jump = false; });
-            buttonjump.events.onInputDown.add(function() { jump = true; });
-            buttonjump.events.onInputUp.add(  function() { jump = false; });
+            buttonJump = game.add.button(0, game.height/2, 'buttonJump', null, this, 0, 1, 0, 1);
+            buttonJump.scale.setTo(2);
+            buttonJump.x = game.width - btnSeparation - buttonJump.width;
+            buttonJump.fixedToCamera = true;
+            buttonJump.events.onInputOver.add(function() { jump = true; });
+            buttonJump.events.onInputOut.add( function() { jump = false; });
+            buttonJump.events.onInputDown.add(function() { jump = true; });
+            buttonJump.events.onInputUp.add(  function() { jump = false; });
 
-            buttonleft = game.add.button(0, game.height/2, 'buttonhorizontal', null, this, 0, 1, 0, 1);
-            buttonleft.scale.setTo(2);
-            buttonleft.x = btnSeparation;
-            buttonleft.fixedToCamera = true;
-            buttonleft.events.onInputOver.add(function() {left = true; });
-            buttonleft.events.onInputOut.add( function() {left = false; });
-            buttonleft.events.onInputDown.add(function() {left = true; });
-            buttonleft.events.onInputUp.add(  function() {left = false; });
+            buttonLeft = game.add.button(0, game.height/2, 'buttonhorizontal', null, this, 0, 1, 0, 1);
+            buttonLeft.scale.setTo(2);
+            buttonLeft.x = btnSeparation;
+            buttonLeft.fixedToCamera = true;
+            buttonLeft.events.onInputOver.add(function() {left = true; });
+            buttonLeft.events.onInputOut.add( function() {left = false; });
+            buttonLeft.events.onInputDown.add(function() {left = true; });
+            buttonLeft.events.onInputUp.add(  function() {left = false; });
 
-            buttonright = game.add.button(0, game.height/2, 'buttonhorizontal', null, this, 0, 1, 0, 1);
-            buttonright.scale.setTo(2);
-            buttonright.x = buttonleft.width + btnSeparation * 2;
-            buttonright.fixedToCamera = true;
-            buttonright.events.onInputOver.add(function() { right = true; });
-            buttonright.events.onInputOut.add( function() { right = false; });
-            buttonright.events.onInputDown.add(function() { right = true; });
-            buttonright.events.onInputUp.add(  function() { right = false; });
-
-            game.input.onTap.add(this.goFullScreen, this, null, 'onTap');
+            buttonRight = game.add.button(0, game.height/2, 'buttonhorizontal', null, this, 0, 1, 0, 1);
+            buttonRight.scale.setTo(2);
+            buttonRight.x = buttonLeft.width + btnSeparation * 2;
+            buttonRight.fixedToCamera = true;
+            buttonRight.events.onInputOver.add(function() { right = true; });
+            buttonRight.events.onInputOut.add( function() { right = false; });
+            buttonRight.events.onInputDown.add(function() { right = true; });
+            buttonRight.events.onInputUp.add(  function() { right = false; });
         }
     },
-    render: function() {
-    },
+    render: function() {},
     update: function () {
-        // Keyboard
-        if (cursors.left.isDown ||
-            left ||
-            pad1.isDown(Phaser.Gamepad.XBOX360_DPAD_LEFT) ||
-            pad1.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X) < -0.1) {
-            if (game.global.cameraAngle === 358) {
+        // Controles
+        if (this.keyboard.left.isDown ||
+            this.keyboard.a.isDown ||
+            this.virtual.left ||
+            this.gamepad.isDown(Phaser.Gamepad.XBOX360_DPAD_LEFT) ||
+            this.gamepad.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X) < -0.1
+        ) {
+            if (game.global.cameraAngle === 359) {
                 game.global.cameraAngle = 0;
             } else {
                 game.global.cameraAngle = game.global.cameraAngle + 1;
             }
             game.global.lastMove = 'left';
-            tower.updateState();
-            background.move('left');
-            platforms.callAll('updateState', null);
-            platforms.sort('depth', Phaser.Group.SORT_ASCENDING);
+            this.tower.updateState();
+            this.background.move('left');
+            this.platforms.callAll('updateState', null);
+            this.platforms.sort('depth', Phaser.Group.SORT_ASCENDING);
         }
-        else if (cursors.right.isDown ||
-            right ||
-            pad1.isDown(Phaser.Gamepad.XBOX360_DPAD_RIGHT) ||
-            pad1.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X)) {
+        else if (this.keyboard.right.isDown ||
+            this.keyboard.d.isDown ||
+            this.virtual.right ||
+            this.gamepad.isDown(Phaser.Gamepad.XBOX360_DPAD_RIGHT) ||
+            this.gamepad.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X)
+        ) {
             if (game.global.cameraAngle === 0) {
-                game.global.cameraAngle = 358;
+                game.global.cameraAngle = 359;
             } else {
                 game.global.cameraAngle = game.global.cameraAngle - 1;
             }
             game.global.lastMove = 'right';
-            background.move('right');
-            tower.updateState();
-            platforms.callAll('updateState', null);
-            platforms.sort('depth', Phaser.Group.SORT_ASCENDING);
+            this.background.move('right');
+            this.tower.updateState();
+            this.platforms.callAll('updateState', null);
+            this.platforms.sort('depth', Phaser.Group.SORT_ASCENDING);
         }
 
-        if (jumpButton.justPressed() ||
-            jump ||
-            pad1.justPressed(Phaser.Gamepad.XBOX360_A)) {
-            player.jump();
+        if (this.keyboard.jump.isDown ||
+            this.virtual.right ||
+            this.gamepad.justPressed(Phaser.Gamepad.XBOX360_A)
+        ) {
+            this.player.jump();
         }
 
         // Virtual controller
         if (game.input.currentPointers == 0 && !game.input.activePointer.isMouse) {
-            right = false;
-            left = false;
-            jump = false;
-        }
-    },
-    goFullScreen: function(pointer, event, msg) {
-        if (game.scale.isFullScreen) {
-            // game.scale.stopFullScreen();
-        } else {
-            game.scale.startFullScreen(false);
+            this.virtual.right = false;
+            this.virtual.left = false;
+            this.virtual.jump = false;
         }
     },
     generateTextureShadow: function(casterKey, shadowSize) {
@@ -208,12 +184,12 @@ gameState.prototype = {
         var length = endPoint -startingPoint;
         var endAngle = startingAngle + (((length / offsetY) - 1) * offsetAngle) % 359;
         for (var i = 0; i < (length / offsetY); i++) {
-            platforms.add(new Platform(
+            this.platforms.add(new Platform(
                 game,
                 startingAngle + (i * offsetAngle) % 359,
                 startingPoint + (i * offsetY)
             ));
-            shadows.add(new Shadow(game, platforms.getAt(i), -10));
+            this.shadows.add(new Shadow(game, this.platforms.getAt(i), -10));
         }
         return endAngle;
     },
@@ -230,13 +206,13 @@ gameState.prototype = {
                 forward: true,
                 tick: 0
             };
-            movingplatforms.add(new MovingPlatform(
+            this.movingplatforms.add(new MovingPlatform(
                 game,
                 startingAngle +  (i * offsetAngle) % 359,
                 startingPoint + (i * offsetY),
                 movement)
             );
-            shadows.add(new Shadow(game, movingplatforms.getAt(i), -10));
+            this.shadows.add(new Shadow(game, this.movingplatforms.getAt(i), -10));
         }
     }
 
