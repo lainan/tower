@@ -37,7 +37,6 @@ Platform.prototype.updateShadow = function() {
     }
 };
 
-
 Platform.prototype.updateLocation = function() {
     this.body.x = this.game.world.centerX + (this.pivotRadius * Math.sin(this.angleFinal * Math.PI / 180));
     // Mantenemos el sprite en los bordes de la torre

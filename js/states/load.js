@@ -16,11 +16,13 @@ var loadState = {
 
         game.load.image('background', 'assets/sprites/background.png');
         game.load.spritesheet('tower', 'assets/sprites/tower.png', 798, 132, 360);
-        this.game.load.atlas('platform', 'assets/sprites/platform.png', 'assets/sprites/platform.json');
+        game.load.atlas('platform', 'assets/sprites/platform.png', 'assets/sprites/platform.json');
+        game.load.atlas('worm', 'assets/sprites/worm.png', 'assets/sprites/worm.json');
 
 
         game.load.image('track', 'assets/sprites/track.png');
         game.load.image('spark', 'assets/sprites/spark-particle.png');
+        game.load.image('dust', 'assets/sprites/smoke-particle.png');
 
         // DATA
         game.load.physics('physicsData', 'assets/physics/sprites.json');

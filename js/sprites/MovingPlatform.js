@@ -41,11 +41,11 @@ var MovingPlatform = function (game, angleOffset, y = game.world.centerY, moveme
             this.right.e.emitX = x + (this.right.x * Math.cos(p.angleFinal * Math.PI / 180));
             this.right.e.emitY = p.y + this.right.y;
             if (p.angleFinal.between(0, 90) || p.angleFinal.between(270, 359)) {
-                this.left.e.visible = true;
-                this.right.e.visible = true;
+                this.left.e.on = true;
+                this.right.e.on = true;
             } else {
-                this.left.e.visible = false;
-                this.right.e.visible = false;
+                this.left.e.on = false;
+                this.right.e.on = false;
             }
         }
     };
@@ -57,6 +57,7 @@ var MovingPlatform = function (game, angleOffset, y = game.world.centerY, moveme
         sparks[v].e.minParticleScale = 0.1;
         sparks[v].e.maxParticleScale = 0.6;
         sparks[v].e.start(false, 150, 1);
+        game.global.sparksGroup.add(sparks[v].e);
     });
 
     this.updateState();
@@ -67,10 +68,10 @@ MovingPlatform.prototype = Object.create(Platform.prototype);
 MovingPlatform.prototype.constructor = MovingPlatform;
 
 MovingPlatform.prototype.updateState = function() {
-    if (this.movement.tick % this.movement.angleSpeed === 0) {
+    if (this.movement.tick % this.movement.updateRate === 0) {
         if ((this.movement.currentAngle < this.movement.finalAngle) &&
              this.movement.forward === true) {
-            this.movement.currentAngle += 1;
+            this.movement.currentAngle += this.movement.angleSpeed;
         } else {
             this.movement.forward = false;
         }
