@@ -14,8 +14,13 @@ gameState.prototype = {
             lastMove: 'none',
             sparksGroup: game.add.group(),
             tracksGroup: game.add.group(),
-            dustGroup: game.add.group()
-
+            dustGroup: game.add.group(),
+            score: {
+                finalTime: 0,
+                maxHeight: 0,
+                totalJumps: 0,
+                timer: game.time.create(false)
+            }
         };
         this.generateTextureShadow('platform');
         this.generateTextureShadow('worm');
@@ -103,9 +108,22 @@ gameState.prototype = {
             buttonRight.events.onInputDown.add(function() { right = true; });
             buttonRight.events.onInputUp.add(  function() { right = false; });
         }
+
+        game.global.score.timer.start();
     },
     render: function() {},
     update: function () {
+        // Puntuación
+        // game.global.score.finalTime = game.global.score.timer.seconds;
+        var currentHeight = game.world.height - this.player.y;
+        if (currentHeight > game.global.score.maxHeight) {
+            console.log(currentHeight);
+            game.global.score.maxHeight = currentHeight;
+        }
+
+        // game.global.score.totalJumps = 0;
+
+
         // Controles
         if (this.keyboard.left.isDown ||
             this.keyboard.a.isDown ||

@@ -11,6 +11,9 @@ var Worm = function (game, y, length) {
         );
     }
 
+    this.head = this.getAt(0);
+    this.tail = this.getAt(length);
+
     game.add.existing(this);
 };
 
