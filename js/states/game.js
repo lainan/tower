@@ -21,6 +21,11 @@ gameState.prototype = {
                 totalJumps: 0,
                 dieReason: 'none',
                 timer: game.time.create(false)
+            },
+            virtual: {
+                left: false,
+                right: false,
+                jump: false,
             }
         };
         this.generateTextureShadow('platform');
@@ -70,7 +75,7 @@ gameState.prototype = {
             jump: game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR)
         };
         // Virtual
-        this.virtual = {
+        game.global.virtual = {
             left: false,
             right: false,
             jump: false,
@@ -79,39 +84,38 @@ gameState.prototype = {
         game.input.gamepad.start();
         this.gamepad = game.input.gamepad.pad1;
 
-        if (!game.device.desktop) {
+        if (game.device.desktop) {
             // Creación de botones virtuales para móbiles
             var btnSeparation = game.width / 30;
-            buttonJump = game.add.button(0, game.height/2, 'buttonJump', null, this, 0, 1, 0, 1);
+            buttonJump = game.add.button(0, game.height/2, 'buttonjump', null, this, 0, 1, 0, 1);
             buttonJump.scale.setTo(2);
             buttonJump.x = game.width - btnSeparation - buttonJump.width;
             buttonJump.fixedToCamera = true;
-            buttonJump.events.onInputOver.add(function() { jump = true; });
-            buttonJump.events.onInputOut.add( function() { jump = false; });
-            buttonJump.events.onInputDown.add(function() { jump = true; });
-            buttonJump.events.onInputUp.add(  function() { jump = false; });
+            buttonJump.events.onInputOver.add( function(b) { b.game.global.virtual.jump = true; });
+            buttonJump.events.onInputOut.add(  function(b) { b.game.global.virtual.jump = false; });
+            buttonJump.events.onInputDown.add( function(b) { b.game.global.virtual.jump = true; });
+            buttonJump.events.onInputUp.add(   function(b) { b.game.global.virtual.jump = false; });
 
             buttonLeft = game.add.button(0, game.height/2, 'buttonhorizontal', null, this, 0, 1, 0, 1);
             buttonLeft.scale.setTo(2);
             buttonLeft.x = btnSeparation;
             buttonLeft.fixedToCamera = true;
-            buttonLeft.events.onInputOver.add(function() {left = true; });
-            buttonLeft.events.onInputOut.add( function() {left = false; });
-            buttonLeft.events.onInputDown.add(function() {left = true; });
-            buttonLeft.events.onInputUp.add(  function() {left = false; });
+            buttonLeft.events.onInputOver.add( function(b) { b.game.global.virtual.left = true; });
+            buttonLeft.events.onInputOut.add(  function(b) { b.game.global.virtual.left = false; });
+            buttonLeft.events.onInputDown.add( function(b) { b.game.global.virtual.left = true; });
+            buttonLeft.events.onInputUp.add(   function(b) { b.game.global.virtual.left = false; });
 
             buttonRight = game.add.button(0, game.height/2, 'buttonhorizontal', null, this, 0, 1, 0, 1);
             buttonRight.scale.setTo(2);
             buttonRight.x = buttonLeft.width + btnSeparation * 2;
             buttonRight.fixedToCamera = true;
-            buttonRight.events.onInputOver.add(function() { right = true; });
-            buttonRight.events.onInputOut.add( function() { right = false; });
-            buttonRight.events.onInputDown.add(function() { right = true; });
-            buttonRight.events.onInputUp.add(  function() { right = false; });
+            buttonRight.events.onInputOver.add( function(b) { b.game.global.virtual.right = true; });
+            buttonRight.events.onInputOut.add(  function(b) { b.game.global.virtual.right = false; });
+            buttonRight.events.onInputDown.add( function(b) { b.game.global.virtual.right = true; });
+            buttonRight.events.onInputUp.add(   function(b) { b.game.global.virtual.right = false; });
         }
 
         game.global.score.timer.start();
-        console.log(this.worm);
     },
     render: function() {
         // this.platforms.forEach(game.debug.body, game.debug);
@@ -140,7 +144,7 @@ gameState.prototype = {
         // Controles
         if (this.keyboard.left.isDown ||
             this.keyboard.a.isDown ||
-            this.virtual.left ||
+            game.global.virtual.left ||
             this.gamepad.isDown(Phaser.Gamepad.XBOX360_DPAD_LEFT) ||
             this.gamepad.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X) < -0.1
         ) {
@@ -157,7 +161,7 @@ gameState.prototype = {
         }
         else if (this.keyboard.right.isDown ||
             this.keyboard.d.isDown ||
-            this.virtual.right ||
+            game.global.virtual.right ||
             this.gamepad.isDown(Phaser.Gamepad.XBOX360_DPAD_RIGHT) ||
             this.gamepad.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X)
         ) {
@@ -176,7 +180,7 @@ gameState.prototype = {
         }
 
         if (this.keyboard.jump.isDown ||
-            this.virtual.right ||
+            game.global.virtual.right ||
             this.gamepad.justPressed(Phaser.Gamepad.XBOX360_A)
         ) {
             this.player.jump();
@@ -184,9 +188,9 @@ gameState.prototype = {
 
         // Virtual controller
         if (game.input.currentPointers == 0 && !game.input.activePointer.isMouse) {
-            this.virtual.right = false;
-            this.virtual.left = false;
-            this.virtual.jump = false;
+            game.global.virtual.right = false;
+            game.global.virtual.left = false;
+            game.global.virtual.jump = false;
         }
 
 
