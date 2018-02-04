@@ -226,20 +226,18 @@ gameState.prototype = {
 
         // Nivel 1
         var finalAngle = this.createMixStairs(lvl.I.startPoint, lvl.I.endPoint, 70, 0, 25, 2);
-
+        finalAngle =  (Math.round(finalAngle) + 20) % 360
         // Nivel 2
-        finalAngle = this.createMixStairs(lvl.II.startPoint, lvl.II.endPoint, 70, Math.round(finalAngle) + 20, 20, 3);
-
+        finalAngle = this.createMixStairs(lvl.II.startPoint, lvl.II.endPoint, 70, finalAngle, 20, 3);
+        finalAngle =  (Math.round(finalAngle) + 20) % 360
         // Nivel 3
-        //this.createMovingStairs(game.world.bounds.height - 400, game.world.bounds.height + 5, 70, Math.floor(t) + 15, 15);
+        finalAngle = this.createMixStairs(lvl.III.startPoint, lvl.III.endPoint, 70, finalAngle, 20, 5);
+        finalAngle =  (Math.round(finalAngle) + 20) % 360
+
         this.worm = new Worm(game, 0, 10);
         this.worm.forEach(function(wormSection) {
             this.shadows.add(new Shadow(game, wormSection, -10));
         }, this);
-
-
-
-
 
 
         game.world.bringToTop(this.shadows);
@@ -294,9 +292,8 @@ gameState.prototype = {
         var nextFinalAngle = 0;
         var lastFinalAngle = 0;
         maxSpeedMP = maxSpeedMP ? maxSpeedMP: 1;
-        for (var i = Math.round(length / offsetY); i >= 0; i--) {
-            console.log(i, frecuencyMP, i % frecuencyMP)
-            if (i % frecuencyMP) {
+        for (var i = 0; i < Math.round(length / offsetY); i++) {
+            if (i % frecuencyMP > 0) {
                 // Para evitar saltos imposibles
                 while(nextFinalAngle === lastFinalAngle) {
                     nextFinalAngle = getRandomInt(5, 45);
@@ -310,21 +307,20 @@ gameState.prototype = {
                 lastFinalAngle = movement.finalAngle;
                 newPlatform = new MovingPlatform(game,
                     startingAngle +  (totalAngle) % 359,
-                    startingPoint + (i * offsetY),
+                    endPoint - (i * offsetY),
                     movement);
-                totalAngle += (lastFinalAngle + offsetAngle);
+                totalAngle += (offsetAngle + lastFinalAngle);
                 this.movingPlatforms.add(newPlatform);
                 this.shadows.add(new Shadow(game, newPlatform, -10));
             } else {
                 newPlatform = new Platform(game,
                     startingAngle + (totalAngle) % 359,
-                    startingPoint + (i * offsetY)
+                    endPoint - (i * offsetY)
                 )
                 totalAngle += offsetAngle;
                 this.platforms.add(newPlatform);
                 this.shadows.add(new Shadow(game, newPlatform, -10));
             }
-            // this.shadows.add(new Shadow(game, newPlatform, -10));
         }
         return totalAngle;
     },
