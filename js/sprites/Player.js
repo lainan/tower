@@ -17,6 +17,9 @@ var Player = function (game, x, y) {
     this.jumpTimer = game.time.now;
 
     game.add.existing(this);
+    this.tweenBounce = this.game.add.tween(this.scale)
+        .to( { x: 0.4, y: 0.6 }, 300, Phaser.Easing.Linear.None, true)
+        .yoyo(true, 0);
 };
 
 Player.prototype = Object.create(Phaser.Sprite.prototype);
@@ -38,12 +41,18 @@ Player.prototype.updateState = function() {
 };
 
 Player.prototype.jump = function() {
-    if ((this.body.blocked.down || this.body.touching.down) &&
-        this.jumpCount < this.maxJumps &&
-        this.jumpTimer < this.game.time.now
-    ) {
-        this.body.velocity.y = -600;
-        this.jumpTimer = this.game.time.now + 500;
-        this.jumpCount = 0; // += 1
+    // if ((this.body.blocked.down || this.body.touching.down) &&
+    //     this.jumpCount < this.maxJumps &&
+    //     this.jumpTimer < this.game.time.now
+    // ) {
+    //     this.body.velocity.y = -600;
+    //     this.jumpTimer = this.game.time.now + 500;
+    //     this.jumpCount = 0; // += 1
+    //     this.game.global.score.totalJumps += 1;
+    // }
+    this.body.velocity.y = -600;
+    if (!this.tweenBounce.isRunning) {
+        this.tweenBounce.start();
     }
+
 };

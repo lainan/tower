@@ -12,7 +12,7 @@ var WormSection = function (game, angleOffset, y) {
 
     this.frameName = '0090';
     this.pivotRadius = Math.floor((game.global.towerWidth + this.width) / 2);
-    this.angleOffset = angleOffset;
+    this.angleOffset = Math.abs(angleOffset) % 360;
     this.angleFinal = this.angleOffset;
 
     this.frameName = '0000';
@@ -56,9 +56,6 @@ WormSection.prototype.updateDust = function() {
     } else {
         this.dust.on = false;
     }
-    // this.dust.forEachAlive(function(d) {
-    //     d.alpha = d.lifespan / this.dust.lifespan;
-    // });
 };
 
 WormSection.prototype.updateState = function() {

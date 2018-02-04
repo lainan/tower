@@ -11,7 +11,7 @@ gameState.prototype = {
             cameraAngle: 0,
             towerWidth: game.cache.getFrameByIndex('tower', 1).width,
             towerHeight: game.cache.getFrameByIndex('tower', 1).height,
-            lastMove: 'none',
+            lastMove: null,
             sparksGroup: game.add.group(),
             tracksGroup: game.add.group(),
             dustGroup: game.add.group(),
@@ -21,65 +21,47 @@ gameState.prototype = {
                 totalJumps: 0,
                 dieReason: 'none',
                 timer: game.time.create(false)
-            },
-            virtual: {
-                left: false,
-                right: false,
-                jump: false,
             }
         };
         this.generateTextureShadow('platform');
         this.generateTextureShadow('platform-metal');
         this.generateTextureShadow('worm');
+        this.generateTextureShadow('ball');
     },
     create: function () {
-        game.stage.setBackgroundColor('4488AA');
-        game.world.setBounds(0, 0, screenWidth, screenHeight * 10);
+        game.world.setBounds(0, 0, screenWidth, screenHeight * 6);
 
         this.background = new Background(game);
         this.tower = new Tower(game);
 
         this.shadows = game.add.group();
         this.platforms = game.add.group();
-        var t = this.createStairs(0, game.world.bounds.height, 10, 0, 10);
-
         this.movingPlatforms = game.add.group();
-        // this.createMovingStairs(game.world.bounds.height - 400, game.world.bounds.height + 5, 70, Math.floor(t) + 15, 15);
+        this.worms = game.add.group();
 
-
-        this.worm = new Worm(game, game.world.bounds.height - 100, 10);
-        this.worm.forEach(function(wormSection) {
-            this.shadows.add(new Shadow(game, wormSection, -10));
-        }, this);
-
-        game.world.bringToTop(this.shadows);
-        game.world.bringToTop(game.global.sparksGroup);
-        game.world.bringToTop(this.movingPlatforms);
-        game.world.bringToTop(this.platforms);
-        game.world.bringToTop(game.global.dustGroup);
-        game.world.bringToTop(this.worm);
+        this.generateLevel();
 
         this.player = new Player(game, game.world.centerX, game.world.height - 250);
+        // this.shadows.add(game.add.sprite(game, game.world.centerX, this.player.y, game.cache.getBitmapData('ball-shadow')));
         game.camera.follow(this.player);
         game.camera.x = game.world.centerX;
         game.camera.y = game.world.centerY - 500;
         game.physics.arcade.gravity.y = 1200;
 
-
         // CONTROLES
         // Teclado
         this.keyboard = {
-            a:  game.input.keyboard.addKey(Phaser.Keyboard.A),
-            d: game.input.keyboard.addKey(Phaser.Keyboard.D),
+            a:     game.input.keyboard.addKey(Phaser.Keyboard.A),
+            d:     game.input.keyboard.addKey(Phaser.Keyboard.D),
             left:  game.input.keyboard.addKey(Phaser.Keyboard.LEFT),
             right: game.input.keyboard.addKey(Phaser.Keyboard.RIGHT),
-            jump: game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR)
+            jump:  game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR)
         };
         // Virtual
         game.global.virtual = {
-            left: false,
+            left:  false,
             right: false,
-            jump: false,
+            jump:  false,
         }
         // Mando XBOX
         game.input.gamepad.start();
@@ -117,8 +99,13 @@ gameState.prototype = {
         }
 
         game.global.score.timer.start();
+        this.platforms.sort('depth', Phaser.Group.SORT_ASCENDING);
+        this.movingPlatforms.sort('depth', Phaser.Group.SORT_ASCENDING);
+
+        game.camera.flash(0x000000, 3000);
     },
     render: function() {
+        // BODY DEBUG
         // this.platforms.forEach(game.debug.body, game.debug);
         // this.movingPlatforms.forEach(game.debug.body, game.debug);
         // this.worm.forEach(game.debug.body, game.debug);
@@ -126,15 +113,12 @@ gameState.prototype = {
         // game.debug.body(this.player);
     },
     update: function () {
-        // Puntuación
+        // Actualización de datos para la puntuación del jugador
         // game.global.score.finalTime = game.global.score.timer.seconds;
         var currentHeight = game.world.height - this.player.y;
         if (currentHeight > game.global.score.maxHeight) {
             game.global.score.maxHeight = currentHeight;
         }
-
-        // game.global.score.totalJumps = 0;
-
         game.physics.arcade.collide(this.player, this.platforms);
         game.physics.arcade.collide(this.player, this.movingPlatforms);
         game.physics.arcade.collide(this.player, this.worm.wormBody);
@@ -155,10 +139,6 @@ gameState.prototype = {
                 game.global.cameraAngle = game.global.cameraAngle + 1;
             }
             game.global.lastMove = 'left';
-            this.tower.updateState();
-            this.background.move('left');
-            this.platforms.callAll('updateState', null);
-            this.platforms.sort('depth', Phaser.Group.SORT_ASCENDING);
         }
         else if (this.keyboard.right.isDown ||
             this.keyboard.d.isDown ||
@@ -172,12 +152,16 @@ gameState.prototype = {
                 game.global.cameraAngle = game.global.cameraAngle - 1;
             }
             game.global.lastMove = 'right';
-            this.background.move('right');
+        } else {
+            game.global.lastMove = null;
+        }
+
+
+        if (game.global.lastMove !== null) {
+            this.background.move(game.global.lastMove);
             this.tower.updateState();
             this.platforms.callAll('updateState', null);
             this.platforms.sort('depth', Phaser.Group.SORT_ASCENDING);
-        } else {
-            game.global.lastMove = 'none';
         }
 
         if (this.keyboard.jump.isDown ||
@@ -188,14 +172,13 @@ gameState.prototype = {
         }
 
         // Virtual controller
-        if (game.input.currentPointers == 0 && !game.input.activePointer.isMouse) {
+        if (game.input.currentPointers === 0 &&
+            !game.input.activePointer.isMouse
+        ) {
             game.global.virtual.right = false;
             game.global.virtual.left = false;
             game.global.virtual.jump = false;
         }
-
-
-
     },
     // GRÁFICOS
     // Genera una sombra (círculo gradiente con transparencia) según el sprite que se le pase
@@ -220,6 +203,52 @@ gameState.prototype = {
         game.cache.addBitmapData(shadowKey, bmd);
     },
     // GENERACIÓN DE NIVELES
+    generateLevel: function() {
+        // 3 Niveles (1: fácil, 2: medio, 3: difícil)
+        // Altura nivel 1: 1 x screenHeight
+        // Altura nivel 2: 2 x screenHeight
+        // Altura nivel 3: 3 x screenHeight
+        var lvl = {
+            I: {
+                startPoint: game.world.bounds.height - screenHeight,
+                endPoint: game.world.bounds.height - 100
+            },
+            II: {
+                startPoint: game.world.bounds.height - (3 * screenHeight),
+                endPoint: game.world.bounds.height - screenHeight
+            },
+            III: {
+                startPoint: 0,
+                endPoint: game.world.bounds.height - (3 * screenHeight)
+            }
+        };
+        console.log(lvl);
+
+        // Nivel 1
+        var finalAngle = this.createMixStairs(lvl.I.startPoint, lvl.I.endPoint, 70, 0, 25, 2);
+
+        // Nivel 2
+        finalAngle = this.createMixStairs(lvl.II.startPoint, lvl.II.endPoint, 70, Math.round(finalAngle) + 20, 20, 3);
+
+        // Nivel 3
+        //this.createMovingStairs(game.world.bounds.height - 400, game.world.bounds.height + 5, 70, Math.floor(t) + 15, 15);
+        this.worm = new Worm(game, 0, 10);
+        this.worm.forEach(function(wormSection) {
+            this.shadows.add(new Shadow(game, wormSection, -10));
+        }, this);
+
+
+
+
+
+
+        game.world.bringToTop(this.shadows);
+        game.world.bringToTop(game.global.sparksGroup);
+        game.world.bringToTop(this.movingPlatforms);
+        game.world.bringToTop(this.platforms);
+        game.world.bringToTop(game.global.dustGroup);
+        game.world.bringToTop(this.worm);
+    },
     // Crea una serie de plataformas en diagonal, devuelve el ángulo de la última plataforma colocada
     createStairs: function(startingPoint, endPoint, offsetY, startingAngle, offsetAngle) {
         var length = endPoint -startingPoint;
@@ -240,10 +269,10 @@ gameState.prototype = {
         var endAngle = startingAngle + (((length / offsetY) - 1) * offsetAngle) % 359;
         for (var i = 0; i < (length / offsetY); i++) {
             var movement = {
-                finalAngle: 10,
+                finalAngle: getRandomInt(15, 35),
                 updateRate: 2,
                 angleSpeed: 1,
-                forward: true,
+                forward: Math.random() > 0.5 ? true: false,
             };
             this.movingPlatforms.add(new MovingPlatform(
                 game,
@@ -254,9 +283,57 @@ gameState.prototype = {
             this.shadows.add(new Shadow(game, this.movingPlatforms.getAt(i), -10));
         }
     },
+    createMixStairs: function(
+        startingPoint, endPoint, offsetY,
+        startingAngle, offsetAngle,
+        frecuencyMP, maxSpeedMP
+    ) {
+        var length = endPoint - startingPoint;
+        var newPlatform;
+        var totalAngle = 0;
+        var nextFinalAngle = 0;
+        var lastFinalAngle = 0;
+        maxSpeedMP = maxSpeedMP ? maxSpeedMP: 1;
+        for (var i = Math.round(length / offsetY); i >= 0; i--) {
+            console.log(i, frecuencyMP, i % frecuencyMP)
+            if (i % frecuencyMP) {
+                // Para evitar saltos imposibles
+                while(nextFinalAngle === lastFinalAngle) {
+                    nextFinalAngle = getRandomInt(5, 45);
+                }
+                var movement = {
+                    finalAngle: nextFinalAngle,
+                    updateRate: 2,
+                    angleSpeed: getRandomInt(1, maxSpeedMP),
+                    forward: false,
+                };
+                lastFinalAngle = movement.finalAngle;
+                newPlatform = new MovingPlatform(game,
+                    startingAngle +  (totalAngle) % 359,
+                    startingPoint + (i * offsetY),
+                    movement);
+                totalAngle += (lastFinalAngle + offsetAngle);
+                this.movingPlatforms.add(newPlatform);
+                this.shadows.add(new Shadow(game, newPlatform, -10));
+            } else {
+                newPlatform = new Platform(game,
+                    startingAngle + (totalAngle) % 359,
+                    startingPoint + (i * offsetY)
+                )
+                totalAngle += offsetAngle;
+                this.platforms.add(newPlatform);
+                this.shadows.add(new Shadow(game, newPlatform, -10));
+            }
+            // this.shadows.add(new Shadow(game, newPlatform, -10));
+        }
+        return totalAngle;
+    },
     // LÓGICA DE JUEGO
     enemyHitsPlayer: function(player, enemy) {
         game.camera.flash(0xd50000, 600);
+        game.camera.shake(0.01, 500);
+        game.state.restart();
+
     }
 
 };

@@ -12,7 +12,7 @@ var MovingPlatform = function (game, angleOffset, y = game.world.centerY, moveme
 
     this.frameName = '0090';
     this.pivotRadius = Math.floor((game.global.towerWidth + this.width) / 2);
-    this.angleOffset = angleOffset;
+    this.angleOffset = Math.abs(angleOffset) % 360;
     this.angleFinal = this.angleOffset;
 
     //this.frameName = '0000';
@@ -83,7 +83,7 @@ MovingPlatform.prototype.updateState = function() {
         if ((this.movement.currentAngle <= this.movement.finalAngle) &&
             (this.movement.currentAngle > 0) &&
              this.movement.forward === false ) {
-            this.movement.currentAngle -= 1;
+            this.movement.currentAngle -= this.movement.angleSpeed;
         } else {
             this.movement.forward = true;
         }

@@ -12,7 +12,7 @@ var Platform = function (game, angleOffset, y = game.world.centerY) {
 
     this.frameName = '0090';
     this.pivotRadius = Math.floor((game.global.towerWidth + this.width) / 2);
-    this.angleOffset = angleOffset;
+    this.angleOffset = Math.abs(angleOffset) % 360;
     this.angleFinal = this.angleOffset;
 
     // this.frameName = '0000';
