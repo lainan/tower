@@ -84,7 +84,7 @@ gameState.prototype = {
         game.input.gamepad.start();
         this.gamepad = game.input.gamepad.pad1;
 
-        if (game.device.desktop) {
+        if (!game.device.desktop) {
             // Creación de botones virtuales para móbiles
             var btnSeparation = game.width / 30;
             buttonJump = game.add.button(0, game.height/2, 'buttonjump', null, this, 0, 1, 0, 1);
@@ -180,7 +180,7 @@ gameState.prototype = {
         }
 
         if (this.keyboard.jump.isDown ||
-            game.global.virtual.right ||
+            game.global.virtual.jump ||
             this.gamepad.justPressed(Phaser.Gamepad.XBOX360_A)
         ) {
             this.player.jump();
