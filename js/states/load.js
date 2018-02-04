@@ -8,15 +8,16 @@ var loadState = {
 
         // IMAGES
         game.load.image('game-logo', './assets/sprites/logo.png');
-        game.load.image('mushroom', 'assets/sprites/mushroom.png');
 
-        game.load.spritesheet('buttonvertical', 'assets/buttons/button-vertical.png',64,64);
-        game.load.spritesheet('buttonhorizontal', 'assets/buttons/button-horizontal.png',96,64);
-        game.load.spritesheet('buttonjump', 'assets/buttons/button-round-b.png',96,96);
+        game.load.spritesheet('buttonvertical', 'assets/buttons/button-vertical.png', 64, 64);
+        game.load.spritesheet('buttonhorizontal', 'assets/buttons/button-horizontal.png', 96, 64);
+        game.load.spritesheet('buttonjump', 'assets/buttons/button-round-b.png', 96, 96);
 
         game.load.image('background', 'assets/sprites/background.png');
         game.load.spritesheet('tower', 'assets/sprites/tower.png', 798, 132, 360);
+        game.load.atlas('ball', 'assets/sprites/ball.png', 'assets/sprites/ball.json');
         game.load.atlas('platform', 'assets/sprites/platform.png', 'assets/sprites/platform.json');
+        game.load.atlas('platform-metal', 'assets/sprites/platform-metal.png', 'assets/sprites/platform-metal.json');
         game.load.atlas('worm', 'assets/sprites/worm.png', 'assets/sprites/worm.json');
 
 

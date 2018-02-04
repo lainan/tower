@@ -1,12 +1,13 @@
-/* global Phaser, p2*/
+/* global Phaser */
 
 var Player = function (game, x, y) {
-    this.yAxis = p2.vec2.fromValues(0, 1);
-    Phaser.Sprite.call(this, game, x, y, 'mushroom');
+    Phaser.Sprite.call(this, game, x, y, 'ball');
     this.scale.setTo(0.5);
-    this.anchor.setTo(0.5, 0.5);
+    this.anchor.setTo(0.5);
 
     game.physics.arcade.enable(this);
+    //this.body.setCircle(40);
+    this.body.setSize(80, 80);
     this.body.collideWorldBounds = true;
     this.body.bounce.set(0.1);
     this.body.allowRotation = false;
@@ -23,6 +24,17 @@ Player.prototype.constructor = Player;
 
 Player.prototype.update = function() {
     this.x = this.game.world.centerX;
+    this.body.velocity.x = 0;
+    this.updateState();
+};
+
+
+Player.prototype.updateFrame = function() {
+    this.frameName  = (this.game.global.cameraAngle * 2 % 71).pad(4);
+};
+
+Player.prototype.updateState = function() {
+    this.updateFrame();
 };
 
 Player.prototype.jump = function() {

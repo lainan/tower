@@ -29,6 +29,7 @@ gameState.prototype = {
             }
         };
         this.generateTextureShadow('platform');
+        this.generateTextureShadow('platform-metal');
         this.generateTextureShadow('worm');
     },
     create: function () {
@@ -118,11 +119,11 @@ gameState.prototype = {
         game.global.score.timer.start();
     },
     render: function() {
-        // this.platforms.forEach(game.debug.body, game.debug);
-        // this.movingPlatforms.forEach(game.debug.body, game.debug);
+        this.platforms.forEach(game.debug.body, game.debug);
+        this.movingPlatforms.forEach(game.debug.body, game.debug);
         // // this.worm.getAll(null, null, 1, this.worm.length-1).forEach(game.debug.body, game.debug);
-        // game.debug.bodyInfo(this.player, 16, 24);
-        // game.debug.body(this.player);
+        game.debug.bodyInfo(this.player, 16, 24);
+        game.debug.body(this.player);
     },
     update: function () {
         // Puntuación

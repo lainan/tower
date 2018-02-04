@@ -1,11 +1,11 @@
 /* global $, Phaser, Platform */
 
 var MovingPlatform = function (game, angleOffset, y = game.world.centerY, movement) {
-    Phaser.Sprite.call(this, game, game.world.centerX, y, 'platform');
+    Phaser.Sprite.call(this, game, game.world.centerX, y, 'platform-metal');
     this.anchor.setTo(0.5, 0.5);
     this.depth = 0;
 
-    this.frameCount = game.cache.getFrameCount('platform');
+    this.frameCount = game.cache.getFrameCount('platform-metal');
     this.lastVisibleAngleRight = this.frameCount - 2;
     this.lastVisibleAngleLeft = 359 - (this.frameCount - 2);
     this.invisibleFrame = this.frameCount - 1;
@@ -15,8 +15,9 @@ var MovingPlatform = function (game, angleOffset, y = game.world.centerY, moveme
     this.angleOffset = angleOffset;
     this.angleFinal = this.angleOffset;
 
-    this.frameName = '0000';
+    //this.frameName = '0000';
     game.physics.arcade.enable(this);
+    this.body.setSize(70, 18);
     this.body.immovable = true;
     this.body.allowGravity = false;
     this.movement = movement;

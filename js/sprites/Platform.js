@@ -15,8 +15,9 @@ var Platform = function (game, angleOffset, y = game.world.centerY) {
     this.angleOffset = angleOffset;
     this.angleFinal = this.angleOffset;
 
-    this.frameName = '0000';
+    // this.frameName = '0000';
     game.physics.arcade.enable(this);
+    this.body.setSize(70, 18);
     this.body.immovable = true;
     this.body.allowGravity = false;
 
