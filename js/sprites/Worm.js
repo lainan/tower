@@ -15,6 +15,15 @@ var Worm = function (game, y, length) {
     this.head = this.getAt(0);
     this.tail = this.getAt(length-1);
     this.wormBody =  this.getAll(null, null, 1, length-1);
+    this.head.tweenBreathing = game.add.tween(this.head.scale)
+        .to( {y: 1.5 }, 250, Phaser.Easing.Cubic.Out, true)
+        .yoyo(true, 0)
+        .loop(true);
+    this.tail.tweenBreathing = game.add.tween(this.tail.scale)
+        .to( {y: 1.5 }, 250, Phaser.Easing.Cubic.Out, true)
+        .yoyo(true, 0)
+        .loop(true);
+
 
     this.lastTintUpdate = this.game.time.now;
 

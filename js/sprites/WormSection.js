@@ -39,7 +39,7 @@ var WormSection = function (game, angleOffset, y) {
     game.add.existing(this);
 
     this.tweenBreathing = game.add.tween(this.scale)
-        .to( {y: 1.15}, 400, Phaser.Easing.Cubic.Out, true)
+        .to( {y: 1.16 }, 250, Phaser.Easing.Cubic.Out, true)
         .yoyo(true, 0)
         .loop(true);
 };

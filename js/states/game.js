@@ -34,17 +34,17 @@ gameState.prototype = {
     },
     create: function () {
         game.stage.setBackgroundColor('4488AA');
-        game.world.setBounds(0, 0, screenWidth, screenHeight * 2);
+        game.world.setBounds(0, 0, screenWidth, screenHeight * 10);
 
         this.background = new Background(game);
         this.tower = new Tower(game);
 
         this.shadows = game.add.group();
         this.platforms = game.add.group();
-        var t = this.createStairs(game.world.bounds.height - 700, game.world.bounds.height - 400, 70, 170, 15);
+        var t = this.createStairs(0, game.world.bounds.height, 10, 0, 10);
 
         this.movingPlatforms = game.add.group();
-        this.createMovingStairs(game.world.bounds.height - 400, game.world.bounds.height + 5, 70, Math.floor(t) + 15, 15);
+        // this.createMovingStairs(game.world.bounds.height - 400, game.world.bounds.height + 5, 70, Math.floor(t) + 15, 15);
 
 
         this.worm = new Worm(game, game.world.bounds.height - 100, 10);
@@ -121,7 +121,7 @@ gameState.prototype = {
     render: function() {
         // this.platforms.forEach(game.debug.body, game.debug);
         // this.movingPlatforms.forEach(game.debug.body, game.debug);
-        // // // this.worm.getAll(null, null, 1, this.worm.length-1).forEach(game.debug.body, game.debug);
+        // this.worm.forEach(game.debug.body, game.debug);
         // game.debug.bodyInfo(this.player, 16, 24);
         // game.debug.body(this.player);
     },
@@ -198,6 +198,7 @@ gameState.prototype = {
 
     },
     // GRÁFICOS
+    // Genera una sombra (círculo gradiente con transparencia) según el sprite que se le pase
     generateTextureShadow: function(casterKey, shadowSize) {
         if (shadowSize === undefined) {
             var frontView = game.cache.getFrameByName(casterKey, '0000');
@@ -217,12 +218,9 @@ gameState.prototype = {
         bmd.cls();
         bmd.circle(outerCircle.x, outerCircle.y, outerCircle.radius, grd);
         game.cache.addBitmapData(shadowKey, bmd);
-        // bmd.generateTexture(shadowKey);
-        // game.global[shadowKey]
-        // this.load.imageFromBitmapData(shadowKey, bmd);
-        // bmd.destroy();
     },
     // GENERACIÓN DE NIVELES
+    // Crea una serie de plataformas en diagonal, devuelve el ángulo de la última plataforma colocada
     createStairs: function(startingPoint, endPoint, offsetY, startingAngle, offsetAngle) {
         var length = endPoint -startingPoint;
         var endAngle = startingAngle + (((length / offsetY) - 1) * offsetAngle) % 359;
@@ -236,18 +234,16 @@ gameState.prototype = {
         }
         return endAngle;
     },
+    // Igual que el método de arriba pero para plataformas que se mueven
     createMovingStairs: function(startingPoint, endPoint, offsetY, startingAngle, offsetAngle) {
         var length = endPoint -startingPoint;
+        var endAngle = startingAngle + (((length / offsetY) - 1) * offsetAngle) % 359;
         for (var i = 0; i < (length / offsetY); i++) {
             var movement = {
-                currentAngle: 0,
                 finalAngle: 10,
                 updateRate: 2,
                 angleSpeed: 1,
-                currentY: 0,
-                finalY: 0,
                 forward: true,
-                tick: 0
             };
             this.movingPlatforms.add(new MovingPlatform(
                 game,

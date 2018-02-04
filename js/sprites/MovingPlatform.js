@@ -21,6 +21,8 @@ var MovingPlatform = function (game, angleOffset, y = game.world.centerY, moveme
     this.body.immovable = true;
     this.body.allowGravity = false;
     this.movement = movement;
+    this.movement.currentAngle = 0;
+    this.movement.tick = 0;
 
     this.sparks = {
         parent: this,
