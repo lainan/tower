@@ -16,8 +16,9 @@ var MovingPlatform = function (game, angleOffset, y = game.world.centerY, moveme
     this.angleFinal = this.angleOffset;
 
     this.frameName = '0000';
-    game.physics.p2.enable(this, false);
-    this.body.static = true;
+    game.physics.arcade.enable(this);
+    this.body.immovable = true;
+    this.body.allowGravity = false;
     this.movement = movement;
 
     this.sparks = {

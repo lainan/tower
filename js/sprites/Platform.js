@@ -16,8 +16,9 @@ var Platform = function (game, angleOffset, y = game.world.centerY) {
     this.angleFinal = this.angleOffset;
 
     this.frameName = '0000';
-    game.physics.p2.enable(this, false);
-    this.body.static = true;
+    game.physics.arcade.enable(this);
+    this.body.immovable = true;
+    this.body.allowGravity = false;
 
     this.updateState();
     game.add.existing(this);
@@ -38,14 +39,12 @@ Platform.prototype.updateShadow = function() {
 };
 
 Platform.prototype.updateLocation = function() {
-    this.body.x = this.game.world.centerX + (this.pivotRadius * Math.sin(this.angleFinal * Math.PI / 180));
+    this.x = this.game.world.centerX + (this.pivotRadius * Math.sin(this.angleFinal * Math.PI / 180));
     // Mantenemos el sprite en los bordes de la torre
     if (this.angleFinal.between(91, 136)) {
-        //this.body.x = this.game.world.centerX + (this.pivotRadius * Math.sin(90 * Math.PI / 180));
-        this.body.x = this.game.world.centerX + this.pivotRadius;
+        this.x = this.game.world.centerX + this.pivotRadius;
     } else if (this.angleFinal.between(225, 269)) {
-        //this.body.x = this.game.world.centerX + (this.pivotRadius * Math.sin(270 * Math.PI / 180));
-        this.body.x = this.game.world.centerX -this.pivotRadius;
+        this.x = this.game.world.centerX -this.pivotRadius;
     }
 };
 
@@ -58,7 +57,7 @@ Platform.prototype.updateFrame = function() {
         this.frameName  = (359 - this.angleFinal).pad(4);
     } else {
         this.frameName = (this.invisibleFrame).pad(4);
-        this.body.x = this.game.world.centerX + (this.pivotRadius * Math.sin(90 * Math.PI / 180));
+        this.x = this.game.world.centerX + (this.pivotRadius * Math.sin(90 * Math.PI / 180));
     }
 };
 

@@ -16,8 +16,9 @@ var WormSection = function (game, angleOffset, y) {
     this.angleFinal = this.angleOffset;
 
     this.frameName = '0000';
-    game.physics.p2.enable(this, false);
-    this.body.static = true;
+    game.physics.arcade.enable(this);
+    this.body.immovable = true;
+    this.body.allowGravity = false;
     this.movement = {
         currentAngle: 0,
         updateRate: 1,
@@ -36,6 +37,11 @@ var WormSection = function (game, angleOffset, y) {
 
     this.updateState();
     game.add.existing(this);
+
+    this.tweenBreathing = game.add.tween(this.scale)
+        .to( {y: 1.15}, 400, Phaser.Easing.Cubic.Out, true)
+        .yoyo(true, 0)
+        .loop(true);
 };
 
 WormSection.prototype = Object.create(Platform.prototype);

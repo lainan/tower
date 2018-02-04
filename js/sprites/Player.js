@@ -6,8 +6,10 @@ var Player = function (game, x, y) {
     this.scale.setTo(0.5);
     this.anchor.setTo(0.5, 0.5);
 
-    game.physics.p2.enable(this, false);
-    this.body.fixedRotation = true;
+    game.physics.arcade.enable(this);
+    this.body.collideWorldBounds = true;
+    this.body.bounce.set(0.1);
+    this.body.allowRotation = false;
 
     this.jumpCount = 0;
     this.maxJumps = 1;
@@ -20,33 +22,16 @@ Player.prototype = Object.create(Phaser.Sprite.prototype);
 Player.prototype.constructor = Player;
 
 Player.prototype.update = function() {
-    this.body.x = this.game.world.centerX;
+    this.x = this.game.world.centerX;
 };
 
 Player.prototype.jump = function() {
-    if (this.isTouchingGorund() &&
+    if ((this.body.blocked.down || this.body.touching.down) &&
         this.jumpCount < this.maxJumps &&
         this.jumpTimer < this.game.time.now
     ) {
-        this.body.moveUp(600);
-        this.jumpTimer = this.game.time.now + 100;
+        this.body.velocity.y = -600;
+        this.jumpTimer = this.game.time.now + 500;
         this.jumpCount = 0; // += 1
     }
-};
-
-Player.prototype.isTouchingGorund = function() {
-    var result = false;
-    for (var i = 0; i < this.game.physics.p2.world.narrowphase.contactEquations.length; i++) {
-        var c = this.game.physics.p2.world.narrowphase.contactEquations[i];
-        if (c.bodyA === this.body.data || c.bodyB === this.body.data) {
-            var d = p2.vec2.dot(c.normalA, this.yAxis);
-            if (c.bodyA === this.body.data) {
-                d *= -1;
-            }
-            if (d > 0.5) {
-                result = true;
-            }
-        }
-    }
-    return result;
 };
