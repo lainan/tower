@@ -3,7 +3,6 @@
 var Background = function (game) {
     Phaser.TileSprite.call(this, game, 0, 0, game.world.width, game.world.height, 'background');
     this.updateState();
-    this.tint = 0x555555;
     game.add.existing(this);
 };
 

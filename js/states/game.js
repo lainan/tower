@@ -119,11 +119,11 @@ gameState.prototype = {
         game.global.score.timer.start();
     },
     render: function() {
-        this.platforms.forEach(game.debug.body, game.debug);
-        this.movingPlatforms.forEach(game.debug.body, game.debug);
-        // // this.worm.getAll(null, null, 1, this.worm.length-1).forEach(game.debug.body, game.debug);
-        game.debug.bodyInfo(this.player, 16, 24);
-        game.debug.body(this.player);
+        // this.platforms.forEach(game.debug.body, game.debug);
+        // this.movingPlatforms.forEach(game.debug.body, game.debug);
+        // // // this.worm.getAll(null, null, 1, this.worm.length-1).forEach(game.debug.body, game.debug);
+        // game.debug.bodyInfo(this.player, 16, 24);
+        // game.debug.body(this.player);
     },
     update: function () {
         // Puntuación
@@ -241,7 +241,7 @@ gameState.prototype = {
         for (var i = 0; i < (length / offsetY); i++) {
             var movement = {
                 currentAngle: 0,
-                finalAngle: 0,
+                finalAngle: 10,
                 updateRate: 2,
                 angleSpeed: 1,
                 currentY: 0,
