@@ -46,9 +46,8 @@
     <body>
         <div id="gameContainer"></div>
 
-        <div id="modal" class="modal">
+        <div id="userform" class="modal">
             <form class="modal-content animate">
-                <span class="close" title="Cerrar ventana">&times;</span>
                 <div class="img-container">
                     <label><b>Avatar</b></label><br/>
                     <img src="assets/menu/avatar1.png" alt="Avatar 1" class="avatar" id="avatar1">
@@ -73,9 +72,21 @@
                 </div>
 
                 <div class="container footer">
-                    <button type="button" class="cancelbtn">Cancelar</button>
+                    <button type="button" class="btn-cancel">Cancelar</button>
                 </div>
             </form>
+        </div>
+
+        <div id="scores" class="modal">
+            <div class="modal-content animate">
+                <div class="container">
+                    <ol id="scores-list"></ol>
+                </div>
+
+                <div class="container footer">
+                    <button type="button" class="btn-cancel">Cancelar</button>
+                </div>
+            </div>
         </div>
     </body>
 </html>

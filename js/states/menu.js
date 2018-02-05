@@ -3,6 +3,7 @@
 // eslint-disable-next-line no-unused-vars
 
 var users = {};
+var username = '';
 if (localStorage.getItem('towerUsers') !== null) {
     users = JSON.parse(localStorage.getItem('towerUsers'));
 }
@@ -14,25 +15,23 @@ var menuState = {
         // game.add.plugin(PhaserSuperStorage.StoragePlugin);
         // game.add.plugin(PhaserInput.Plugin);
 
-        this.modal = $('#modal');
-        var modal = $('#modal');
-
         var avatar = '';
-        var username = '';
         var password = '';
 
         $(window).on('click', function(event) {
-            if (event.target == this.modal) {
-                modal.css('display', 'none');
+            if (event.target.className == 'modal') {
+                $('.modal').css('display', 'none');
             }
         });
 
-        $('.cancelbtn').on('click', function() {
-            modal.css('display', 'none');
+        $('.btn-cancel').on('click', function() {
+            $(this).closest('.modal').css('display', 'none');
+            $('#uname').val('');
+            $('#psw').val('');
         });
 
-        $('.close').on('click', function() {
-            modal.css('display', 'none');
+        $('.btn-close').on('click', function() {
+            $(this).closest('.modal').css('display', 'none');
         });
 
         $('.avatar').on('click', function() {
@@ -46,7 +45,7 @@ var menuState = {
             username = $('#uname').val();
             password = $('#psw').val();
             if (menuState.userExist(username) && menuState.checkUser(username, password)) {
-                modal.css('display', 'none');
+                $('#userform').css('display', 'none');
                 menuState.startGame();
             } else {
                 $('#error-msg').text('¡Datos incorrectos!');
@@ -64,10 +63,11 @@ var menuState = {
             } else {
                 users[username] = {
                     'password': password,
-                    'avatar': avatar
+                    'avatar': avatar,
+                    'score': { maxHeight: 0 }
                 };
                 localStorage.setItem('towerUsers', JSON.stringify(users));
-                modal.css('display', 'none');
+                $('#userform').css('display', 'none');
                 menuState.startGame();
             }
 
@@ -96,7 +96,8 @@ var menuState = {
         return false;
     },
     showForm: function() {
-        this.modal.css('display', 'block');
+        $('#userform').css('display', 'block');
+        $('#uname').focus();
     },
     checkUser: function(username, password) {
         if (users[username].password === password) {
@@ -105,6 +106,14 @@ var menuState = {
         return false;
     },
     showScores: function() {
-
+        for (var user in users) {
+            if (users.hasOwnProperty(user)) {
+                if (users[user].score != null &&
+                    $.isEmptyObject(users[user].score) === false) {
+                    $('scores-list').append('<li>' + user + ': ' + users[user].score.maxHeight + '</li>');
+                }
+            }
+        }
+        $('#scores').css('display', 'block');
     }
 };

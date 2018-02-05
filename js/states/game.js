@@ -22,7 +22,14 @@ gameState.prototype = {
                 dieReason: 'none',
                 timer: game.time.create(false)
             },
-            gameOver: false
+            gameOver: false,
+            cheats: {
+                fly: false,
+                nodeath: false
+            },
+            debug: {
+                die: this.endGame
+            }
         };
         this.generateTextureShadow('platform');
         this.generateTextureShadow('platform-metal');
@@ -121,19 +128,23 @@ gameState.prototype = {
         if (currentHeight > game.global.score.maxHeight) {
             game.global.score.maxHeight = currentHeight;
         }
-        game.physics.arcade.collide(this.player, this.platforms);
-        game.physics.arcade.collide(this.player, this.movingPlatforms);
-        game.physics.arcade.collide(this.player, this.worm.wormBody);
 
-        game.physics.arcade.overlap(this.player, this.worm.head, this.enemyHitsPlayer, null, this);
-        game.physics.arcade.overlap(this.player, this.worm.tail, this.enemyHitsPlayer, null, this);
+        if (game.global.gameOver === false) {
+            game.physics.arcade.collide(this.player, this.platforms);
+            game.physics.arcade.collide(this.player, this.movingPlatforms);
+            game.physics.arcade.collide(this.player, this.worm.wormBody);
+
+            game.physics.arcade.overlap(this.player, this.worm.head, this.endGame, null, this);
+            game.physics.arcade.overlap(this.player, this.worm.tail, this.endGame, null, this);
+        }
 
         // Controles
-        if (this.keyboard.left.isDown ||
+        if ((this.keyboard.left.isDown ||
             this.keyboard.a.isDown ||
             game.global.virtual.left ||
             this.gamepad.isDown(Phaser.Gamepad.XBOX360_DPAD_LEFT) ||
-            this.gamepad.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X) < -0.1
+            this.gamepad.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X) < -0.1) &&
+            game.global.gameOver === false
         ) {
             if (game.global.cameraAngle === 359) {
                 game.global.cameraAngle = 0;
@@ -142,11 +153,12 @@ gameState.prototype = {
             }
             game.global.lastMove = 'left';
         }
-        else if (this.keyboard.right.isDown ||
+        else if ((this.keyboard.right.isDown ||
             this.keyboard.d.isDown ||
             game.global.virtual.right ||
             this.gamepad.isDown(Phaser.Gamepad.XBOX360_DPAD_RIGHT) ||
-            this.gamepad.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X)
+            this.gamepad.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X)) &&
+            game.global.gameOver === false
         ) {
             if (game.global.cameraAngle === 0) {
                 game.global.cameraAngle = 359;
@@ -159,7 +171,7 @@ gameState.prototype = {
         }
 
 
-        if (game.global.lastMove !== null && game.global.gameOver === false) {
+        if (game.global.lastMove !== null) {
             this.background.move(game.global.lastMove);
             this.tower.updateState();
             this.platforms.callAll('updateState', null);
@@ -334,16 +346,22 @@ gameState.prototype = {
         return totalAngle;
     },
     // LÓGICA DE JUEGO
-    enemyHitsPlayer: function(player, enemy) {
+    endGame: function(player, enemy) {
+        game.global.gameOver = true;
+
         game.camera.shake(0.01, 500);
         game.camera.flash(0xd50000, 600);
-        // game.camera.onFlashComplete.add(function() {game.camera.fade(0x000000, 600);}, this);
-        var gameOver = game.add.text(screenWidth / 2, screenHeight / 2 + 120, 'GAME OVER', {font: '180px Courier', fill: '#ffffff'});
+
+        var gameOver = game.add.text(screenWidth / 2, screenHeight / 2, 'GAME OVER', {font: '200px Courier', fill: '#ffffff'});
+        gameOver.anchor.setTo(0.5);
         gameOver.inputEnabled = true;
         gameOver.fixedToCamera = true;
-        game.global.gameOver = true;
         gameOver.events.onInputDown.add(this.restartGame, this);
-        gameOver.anchor.setTo(0.5);
+
+        if (users != null && username !== '') {
+            users[username]['score'] = game.global.score;
+            localStorage.setItem('towerUsers', JSON.stringify(users));
+        }
     },
     restartGame: function() {
         game.global.gameOver = false;
