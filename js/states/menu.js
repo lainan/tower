@@ -85,6 +85,8 @@ var menuState = {
         scoresLabel.inputEnabled = true;
         scoresLabel.events.onInputDown.add(this.showScores, this);
         scoresLabel.anchor.setTo(0.5);
+
+        this.fillScores();
     },
     startGame: function() {
         game.state.start('game');
@@ -105,15 +107,17 @@ var menuState = {
         }
         return false;
     },
-    showScores: function() {
+    fillScores: function() {
         for (var user in users) {
             if (users.hasOwnProperty(user)) {
                 if (users[user].score != null &&
                     $.isEmptyObject(users[user].score) === false) {
-                    $('scores-list').append('<li>' + user + ': ' + users[user].score.maxHeight + '</li>');
+                    $('#scores-list').append('<li>' + user + ': ' + users[user].score.maxHeight + '</li>');
                 }
             }
         }
+    },
+    showScores: function() {
         $('#scores').css('display', 'block');
     }
 };
