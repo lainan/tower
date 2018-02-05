@@ -1,7 +1,7 @@
+/* global Phaser, bootState, loadState, menuState, gameState*/
+
 var screenWidth = window.innerWidth * window.devicePixelRatio;
 var screenHeight = window.innerHeight * window.devicePixelRatio;
-
-/* global Phaser, bootState, loadState, menuState, gameState*/
 
 var game = new Phaser.Game(screenWidth, screenHeight, Phaser.CANVAS, 'gameContainer');
 game.state.add('boot', bootState);

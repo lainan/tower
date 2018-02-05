@@ -21,7 +21,8 @@ gameState.prototype = {
                 totalJumps: 0,
                 dieReason: 'none',
                 timer: game.time.create(false)
-            }
+            },
+            gameOver: false
         };
         this.generateTextureShadow('platform');
         this.generateTextureShadow('platform-metal');
@@ -55,7 +56,8 @@ gameState.prototype = {
             d:     game.input.keyboard.addKey(Phaser.Keyboard.D),
             left:  game.input.keyboard.addKey(Phaser.Keyboard.LEFT),
             right: game.input.keyboard.addKey(Phaser.Keyboard.RIGHT),
-            jump:  game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR)
+            jump:  game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR),
+            esc:   game.input.keyboard.addKey(Phaser.Keyboard.ESC)
         };
         // Virtual
         game.global.virtual = {
@@ -157,18 +159,23 @@ gameState.prototype = {
         }
 
 
-        if (game.global.lastMove !== null) {
+        if (game.global.lastMove !== null && game.global.gameOver === false) {
             this.background.move(game.global.lastMove);
             this.tower.updateState();
             this.platforms.callAll('updateState', null);
             this.platforms.sort('depth', Phaser.Group.SORT_ASCENDING);
         }
 
-        if (this.keyboard.jump.isDown ||
+        if ((this.keyboard.jump.isDown ||
             game.global.virtual.jump ||
-            this.gamepad.justPressed(Phaser.Gamepad.XBOX360_A)
+            this.gamepad.justPressed(Phaser.Gamepad.XBOX360_A)) &&
+            game.global.gameOver === false
         ) {
             this.player.jump();
+        }
+
+        if (this.keyboard.esc.justPressed()) {
+            game.state.restart();
         }
 
         // Virtual controller
@@ -222,22 +229,21 @@ gameState.prototype = {
                 endPoint: game.world.bounds.height - (3 * screenHeight)
             }
         };
-        console.log(lvl);
 
         // Nivel 1
         var finalAngle = this.createMixStairs(lvl.I.startPoint, lvl.I.endPoint, 70, 0, 25, 2);
         finalAngle =  (Math.round(finalAngle) + 20) % 360
         // Nivel 2
-        finalAngle = this.createMixStairs(lvl.II.startPoint, lvl.II.endPoint, 70, finalAngle, 20, 3);
-        finalAngle =  (Math.round(finalAngle) + 20) % 360
+        this.worm = new Worm(game, lvl.II.startPoint - 150, 10);
+        this.worm.forEach(function(wormSection) {
+            this.shadows.add(new Shadow(game, wormSection, -10));
+        }, this);
+        finalAngle = this.createMixStairs(lvl.II.startPoint - 300, lvl.II.endPoint, 70, finalAngle, 20, 3);
+        finalAngle =  (Math.round(finalAngle) + 90) % 360
         // Nivel 3
         finalAngle = this.createMixStairs(lvl.III.startPoint, lvl.III.endPoint, 70, finalAngle, 20, 5);
         finalAngle =  (Math.round(finalAngle) + 20) % 360
 
-        this.worm = new Worm(game, 0, 10);
-        this.worm.forEach(function(wormSection) {
-            this.shadows.add(new Shadow(game, wormSection, -10));
-        }, this);
 
 
         game.world.bringToTop(this.shadows);
@@ -280,6 +286,9 @@ gameState.prototype = {
             );
             this.shadows.add(new Shadow(game, this.movingPlatforms.getAt(i), -10));
         }
+    },
+    createWorms: function(startingPoint, endPoint, offsetY, startingAngle, offsetAngle) {
+
     },
     createMixStairs: function(
         startingPoint, endPoint, offsetY,
@@ -326,10 +335,18 @@ gameState.prototype = {
     },
     // LÓGICA DE JUEGO
     enemyHitsPlayer: function(player, enemy) {
-        game.camera.flash(0xd50000, 600);
         game.camera.shake(0.01, 500);
+        game.camera.flash(0xd50000, 600);
+        // game.camera.onFlashComplete.add(function() {game.camera.fade(0x000000, 600);}, this);
+        var gameOver = game.add.text(screenWidth / 2, screenHeight / 2 + 120, 'GAME OVER', {font: '180px Courier', fill: '#ffffff'});
+        gameOver.inputEnabled = true;
+        gameOver.fixedToCamera = true;
+        game.global.gameOver = true;
+        gameOver.events.onInputDown.add(this.restartGame, this);
+        gameOver.anchor.setTo(0.5);
+    },
+    restartGame: function() {
+        game.global.gameOver = false;
         game.state.restart();
-
     }
-
 };

@@ -5,12 +5,18 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="author" content="Adrián Expósito Tofano" />
-        <meta name="description" content="tower v0.99" />
+        <meta name="description" content="tower: the game" />
+
+        <link rel="stylesheet" href="css/main.css">
+
 
         <script type="text/javascript" src="js/utils-color.js"></script>
         <script type="text/javascript" src="js/utils-general.js"></script>
         <script type="text/javascript" src="js/utils-mobile.js"></script>
-
+        <script
+        src="https://code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
         <script type="text/javascript" src="lib/phaser.js"></script>
 
         <script type="text/javascript" src="js/states/boot.js"></script>
@@ -34,12 +40,42 @@
         <script type="text/javascript" src="plugins/phaser-super-storage.min.js"></script>
         <script type="text/javascript" src="plugins/phaser-input.min.js"></script>
 
-        <link rel="stylesheet" href="css/main.css">
-
         <title>tower v0.99</title>
 
     </head>
     <body>
         <div id="gameContainer"></div>
+
+        <div id="modal" class="modal">
+            <form class="modal-content animate">
+                <span class="close" title="Cerrar ventana">&times;</span>
+                <div class="img-container">
+                    <label><b>Avatar</b></label><br/>
+                    <img src="assets/menu/avatar1.png" alt="Avatar 1" class="avatar" id="avatar1">
+                    <img src="assets/menu/avatar2.jpg" alt="Avatar 2" class="avatar" id="avatar2">
+                    <img src="assets/menu/avatar3.jpg" alt="Avatar 3" class="avatar" id="avatar3">
+                    <img src="assets/menu/avatar4.jpg" alt="Avatar 4" class="avatar" id="avatar4">
+                    <img src="assets/menu/avatar5.jpg" alt="Avatar 5" class="avatar" id="avatar5">
+                </div>
+
+                <div class="container">
+                    <span class="error-msg" title="Mensaje de error" id="error-msg"></span>
+                    <br/>
+                    <br/>
+                    <label><b>Username</b></label><br/>
+                    <input type="text" placeholder="Enter Username" name="uname" id="uname" required>
+                    <br/>
+                    <label><b>Password</b></label><br/>
+                    <input type="password" placeholder="Enter Password" name="psw" id="psw" required>
+                    <br/>
+                    <button type="submit" id="login">Login</button>
+                    <button type="submit" id="signup">Registrarse</button>
+                </div>
+
+                <div class="container footer">
+                    <button type="button" class="cancelbtn">Cancelar</button>
+                </div>
+            </form>
+        </div>
     </body>
 </html>

@@ -28,7 +28,6 @@ var Worm = function (game, y, length) {
     this.lastTintUpdate = this.game.time.now;
 
     game.add.existing(this);
-
 };
 
 Worm.prototype = Object.create(Phaser.Group.prototype);
