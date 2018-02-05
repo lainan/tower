@@ -128,7 +128,7 @@ var menuState = {
             }
         }
         sortedScores.sort(function(a, b) {
-            return a.score.final > b.score.final;
+            return a.score.final < b.score.final;
         });
         $.each(sortedScores, function(i) {
             var el = $(
@@ -147,6 +147,8 @@ var menuState = {
         });
     },
     fillScorePanel: function(username) {
+        $('#scores-panel').empty();
+        
         $('#scores-panel').append(
             '<img src="assets/menu/' +
             users[username].avatar +
@@ -162,9 +164,9 @@ var menuState = {
             'Altura: ' +
             Math.round(users[username].score.maxHeight * 0.0167) + 'm <br/>' +
             'Saltos totales: ' +
-            users[username].score.totalJumps + 'saltos <br/>' +
+            users[username].score.totalJumps + ' saltos <br/>' +
             'Grados totales: ' +
-            users[username].score.totalDegrees + 'grados <br/>' +
+            users[username].score.totalDegrees + ' grados <br/>' +
             'Muerte: ' +
             users[username].score.dieReason
         );

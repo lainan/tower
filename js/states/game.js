@@ -249,7 +249,7 @@ gameState.prototype = {
         var finalAngle = this.createMixStairs(lvl.I.startPoint, lvl.I.endPoint, 70, 0, 25, 2);
         finalAngle =  (Math.round(finalAngle) + 20) % 360
         // Nivel 2
-        this.worm = new Worm(game, lvl.II.startPoint - 150, 10);
+        this.worm = new Worm(game, lvl.I.endPoint + 50, 10);
         this.worm.forEach(function(wormSection) {
             this.shadows.add(new Shadow(game, wormSection, -10));
         }, this);
