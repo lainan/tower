@@ -106,6 +106,43 @@ span.psw {
     background-color: #f1f1f1;
 }
 
+#scores .container:nth-child(1) {
+    display: flex;
+    padding: 0;
+}
+
+#scores .modal-content {
+    position: relative;
+    background-color: #fefefe;
+    margin: 0 auto;
+    border: 1px solid #888888;
+    width: 80%;
+}
+
+#scores-list {
+    flex-basis: 55%;
+    padding: 1em;
+    font-family: monospace;
+    font-size: 14px;
+}
+
+#scores-panel {
+    flex-basis: 45%;
+    padding: 1em;
+    background-color: #f1f1f1;
+    border-left: 1px solid black;
+}
+
+.hightlight-score {
+    background-color: red;
+}
+
+.avatar-panel {
+    width: 80%;
+    margin: 1%;
+    border-radius: 50%;
+}
+
 .animate {
     animation: animatezoom 600ms;
 }

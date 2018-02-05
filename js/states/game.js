@@ -15,12 +15,15 @@ gameState.prototype = {
             sparksGroup: game.add.group(),
             tracksGroup: game.add.group(),
             dustGroup: game.add.group(),
+            gameTimer: game.time.create(false),
             score: {
+                final: 0,
                 finalTime: 0,
                 maxHeight: 0,
                 totalJumps: 0,
+                totalDegrees: 0,
                 dieReason: 'none',
-                timer: game.time.create(false)
+                versionGame: 0.99
             },
             gameOver: false,
             cheats: {
@@ -107,7 +110,7 @@ gameState.prototype = {
             buttonRight.events.onInputUp.add(   function(b) { b.game.global.virtual.right = false; });
         }
 
-        game.global.score.timer.start();
+        game.global.gameTimer.start();
         this.platforms.sort('depth', Phaser.Group.SORT_ASCENDING);
         this.movingPlatforms.sort('depth', Phaser.Group.SORT_ASCENDING);
 
@@ -123,7 +126,6 @@ gameState.prototype = {
     },
     update: function () {
         // Actualización de datos para la puntuación del jugador
-        // game.global.score.finalTime = game.global.score.timer.seconds;
         var currentHeight = game.world.height - this.player.y;
         if (currentHeight > game.global.score.maxHeight) {
             game.global.score.maxHeight = currentHeight;
@@ -172,6 +174,7 @@ gameState.prototype = {
 
 
         if (game.global.lastMove !== null) {
+            game.global.score.totalDegrees += 1;
             this.background.move(game.global.lastMove);
             this.tower.updateState();
             this.platforms.callAll('updateState', null);
@@ -347,6 +350,7 @@ gameState.prototype = {
     },
     // LÓGICA DE JUEGO
     endGame: function(player, enemy) {
+        game.global.score.finalTime = game.global.gameTimer.seconds;
         game.global.gameOver = true;
 
         game.camera.shake(0.01, 500);
@@ -359,8 +363,16 @@ gameState.prototype = {
         gameOver.events.onInputDown.add(this.restartGame, this);
 
         if (users != null && username !== '') {
-            users[username]['score'] = game.global.score;
-            localStorage.setItem('towerUsers', JSON.stringify(users));
+            game.global.score.final = Math.round(game.global.score.maxHeight);
+            var current = game.global.score;
+            var past = users[username]['score'];
+            if ((current.final > past.final) ||
+                ((current.final === past.final) && (current.finalTime < past.finalTime))
+            ) {
+                users[username]['score'] = game.global.score;
+                console.log(users, username);
+                localStorage.setItem('towerUsers', JSON.stringify(users));
+            }
         }
     },
     restartGame: function() {

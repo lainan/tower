@@ -6,17 +6,15 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="author" content="Adrián Expósito Tofano" />
         <meta name="description" content="tower: the game" />
+        <link rel="shortcut icon" href="assets/menu/favicon.ico"/>
 
-        <link rel="stylesheet" href="css/main.css">
+        <link rel="stylesheet" href="css/main.css"/>
 
 
         <script type="text/javascript" src="js/utils-color.js"></script>
         <script type="text/javascript" src="js/utils-general.js"></script>
         <script type="text/javascript" src="js/utils-mobile.js"></script>
-        <script
-        src="https://code.jquery.com/jquery-3.3.1.min.js"
-        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
-        crossorigin="anonymous"></script>
+        <script type="text/javascript" src="lib/jquery-3.3.1.slim.js"></script>
         <script type="text/javascript" src="lib/phaser.js"></script>
 
         <script type="text/javascript" src="js/states/boot.js"></script>
@@ -50,7 +48,7 @@
             <form class="modal-content animate">
                 <div class="img-container">
                     <label><b>Avatar</b></label><br/>
-                    <img src="assets/menu/avatar1.png" alt="Avatar 1" class="avatar" id="avatar1">
+                    <img src="assets/menu/avatar1.jpg" alt="Avatar 1" class="avatar" id="avatar1">
                     <img src="assets/menu/avatar2.jpg" alt="Avatar 2" class="avatar" id="avatar2">
                     <img src="assets/menu/avatar3.jpg" alt="Avatar 3" class="avatar" id="avatar3">
                     <img src="assets/menu/avatar4.jpg" alt="Avatar 4" class="avatar" id="avatar4">
@@ -80,11 +78,12 @@
         <div id="scores" class="modal">
             <div class="modal-content animate">
                 <div class="container">
-                    <ol id="scores-list"></ol>
+                    <div id="scores-list"></div>
+                    <div id="scores-panel"></div>
                 </div>
 
                 <div class="container footer">
-                    <button type="button" class="btn-cancel">Cancelar</button>
+                    <button type="button" class="btn-cancel">Cerrar</button>
                 </div>
             </div>
         </div>

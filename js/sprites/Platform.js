@@ -20,7 +20,6 @@ var Platform = function (game, angleOffset, y = game.world.centerY) {
     this.body.setSize(70, 18);
     this.body.immovable = true;
     this.body.allowGravity = false;
-
     this.updateState();
     game.add.existing(this);
 };

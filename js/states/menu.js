@@ -64,7 +64,14 @@ var menuState = {
                 users[username] = {
                     'password': password,
                     'avatar': avatar,
-                    'score': { maxHeight: 0 }
+                    'score': {
+                        final: 0,
+                        finalTime: 0,
+                        maxHeight: 0,
+                        totalJumps: 0,
+                        totalDegrees: 0,
+                        dieReason: 'none'
+                    }
                 };
                 localStorage.setItem('towerUsers', JSON.stringify(users));
                 $('#userform').css('display', 'none');
@@ -108,14 +115,59 @@ var menuState = {
         return false;
     },
     fillScores: function() {
+        var sortedScores = [];
         for (var user in users) {
             if (users.hasOwnProperty(user)) {
                 if (users[user].score != null &&
                     $.isEmptyObject(users[user].score) === false) {
-                    $('#scores-list').append('<li>' + user + ': ' + users[user].score.maxHeight + '</li>');
+                        sortedScores.push({
+                            username: user,
+                            score: users[user].score
+                        });
                 }
             }
         }
+        sortedScores.sort(function(a, b) {
+            return a.score.final > b.score.final;
+        });
+        $.each(sortedScores, function(i) {
+            var el = $(
+                '<div class="user-score">' +
+                (i + 1) + '. ' + this.username + ': ' + this.score.final +
+                '</div>');
+            $('#scores-list').append(el);
+            el.data('username', this.username);
+        });
+
+        $('.user-score').hover(
+            function() { $(this).addClass('hightlight-score'); },
+            function() { $(this).removeClass('hightlight-score'); });
+        $('.user-score').click( function() {
+            menuState.fillScorePanel( $(this).data('username') );
+        });
+    },
+    fillScorePanel: function(username) {
+        $('#scores-panel').append(
+            '<img src="assets/menu/' +
+            users[username].avatar +
+            '.jpg" class="avatar-panel">');
+
+        console.log(users[username]);
+
+        $('#scores-panel').append(
+            'Puntuación: ' +
+            users[username].score.final + '<br/>' +
+            'Tiempo: ' +
+            users[username].score.finalTime + 's <br/>' +
+            'Altura: ' +
+            Math.round(users[username].score.maxHeight * 0.0167) + 'm <br/>' +
+            'Saltos totales: ' +
+            users[username].score.totalJumps + 'saltos <br/>' +
+            'Grados totales: ' +
+            users[username].score.totalDegrees + 'grados <br/>' +
+            'Muerte: ' +
+            users[username].score.dieReason
+        );
     },
     showScores: function() {
         $('#scores').css('display', 'block');
