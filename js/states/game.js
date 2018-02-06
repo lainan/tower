@@ -18,12 +18,13 @@ gameState.prototype = {
             gameTimer: game.time.create(false),
             score: {
                 final: 0,
-                finalTime: 0,
+                timePlayed: 0,
                 maxHeight: 0,
                 totalJumps: 0,
                 totalDegrees: 0,
+                largestDrop: 0,
                 dieReason: 'none',
-                versionGame: 0.99
+                versionGame: 'v0.99'
             },
             gameOver: false,
             cheats: {
@@ -348,35 +349,41 @@ gameState.prototype = {
         }
         return totalAngle;
     },
-    // LÓGICA DE JUEGO
+    showMenu: function() {
+            
+    },
     endGame: function(player, enemy) {
-        game.global.score.finalTime = game.global.gameTimer.seconds;
+        game.global.score.timePlayed = game.global.gameTimer.seconds;
         game.global.gameOver = true;
 
         game.camera.shake(0.01, 500);
         game.camera.flash(0xd50000, 600);
 
-        var gameOver = game.add.text(screenWidth / 2, screenHeight / 2, 'GAME OVER', {font: '200px Courier', fill: '#ffffff'});
+        var gameOver = game.add.text(screenWidth / 2, screenHeight / 2, 'GAME OVER', {font: '10vw Courier', fill: '#ffffff'});
         gameOver.anchor.setTo(0.5);
         gameOver.inputEnabled = true;
         gameOver.fixedToCamera = true;
         gameOver.events.onInputDown.add(this.restartGame, this);
 
+        this.saveUserScore();
+    },
+    restartGame: function() {
+        game.global.gameOver = false;
+        game.state.restart();
+    },
+    saveUserScore: function() {
         if (users != null && username !== '') {
-            game.global.score.final = Math.round(game.global.score.maxHeight);
+            var exp = 1.588078296068942150949562488050183134398622151272156039170;
+            game.global.score.final = Math.ceil(Math.pow(game.global.score.maxHeight, exp));
             var current = game.global.score;
             var past = users[username]['score'];
             if ((current.final > past.final) ||
-                ((current.final === past.final) && (current.finalTime < past.finalTime))
+                ((current.final === past.final) && (current.timePlayed < past.timePlayed))
             ) {
                 users[username]['score'] = game.global.score;
                 console.log(users, username);
                 localStorage.setItem('towerUsers', JSON.stringify(users));
             }
         }
-    },
-    restartGame: function() {
-        game.global.gameOver = false;
-        game.state.restart();
     }
 };
