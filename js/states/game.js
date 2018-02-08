@@ -24,8 +24,9 @@ gameState.prototype = {
                 totalDegrees: 0,
                 largestDrop: 0,
                 dieReason: 'none',
+                result: 'none',
                 seed: 'none',
-                versionGame: 'v0.999'
+                versionGame: 'v0.99.1'
             },
             gameOver: false,
             cheats: {
@@ -42,10 +43,10 @@ gameState.prototype = {
         this.generateTextureShadow('ball');
     },
     create: function () {
-        game.world.setBounds(0, 0, screenWidth, 1000 * 6 + 20);
+        game.world.setBounds(0, 0, screenWidth, 1000 * 6);
         this.seed = [
             'paint', 'gold', 'teeth', 'nuclear', 'hollow', 'death', 'flask',
-            'mania', 'snap', 'souls'
+            'mania', 'snap!', 'souls'
         ];
         game.global.score.seed = game.rnd.pick(this.seed);
         this.random = new Phaser.RandomDataGenerator(game.global.score.seed);
@@ -93,7 +94,7 @@ gameState.prototype = {
         if (!game.device.desktop) {
             // Creación de botones virtuales para móbiles
             var btnSeparation = game.width / 30;
-            buttonJump = game.add.button(0, game.height/2, 'buttonjump', null, this, 0, 1, 0, 1);
+            buttonJump = game.add.button(0, game.height/2, 'btn-jump', null, this, 0, 1, 0, 1);
             buttonJump.scale.setTo(2);
             buttonJump.x = game.width - btnSeparation - buttonJump.width;
             buttonJump.fixedToCamera = true;
@@ -102,7 +103,7 @@ gameState.prototype = {
             buttonJump.events.onInputDown.add( function(b) { b.game.global.virtual.jump = true; });
             buttonJump.events.onInputUp.add(   function(b) { b.game.global.virtual.jump = false; });
 
-            buttonLeft = game.add.button(0, game.height/2, 'buttonhorizontal', null, this, 0, 1, 0, 1);
+            buttonLeft = game.add.button(0, game.height/2, 'btn-horizontal', null, this, 0, 1, 0, 1);
             buttonLeft.scale.setTo(2);
             buttonLeft.x = btnSeparation;
             buttonLeft.fixedToCamera = true;
@@ -111,7 +112,7 @@ gameState.prototype = {
             buttonLeft.events.onInputDown.add( function(b) { b.game.global.virtual.left = true; });
             buttonLeft.events.onInputUp.add(   function(b) { b.game.global.virtual.left = false; });
 
-            buttonRight = game.add.button(0, game.height/2, 'buttonhorizontal', null, this, 0, 1, 0, 1);
+            buttonRight = game.add.button(0, game.height/2, 'btn-horizontal', null, this, 0, 1, 0, 1);
             buttonRight.scale.setTo(2);
             buttonRight.x = buttonLeft.width + btnSeparation * 2;
             buttonRight.fixedToCamera = true;
@@ -387,6 +388,7 @@ gameState.prototype = {
     endGame: function(result, reason) {
         game.global.score.timePlayed = game.global.gameTimer.seconds;
         game.global.score.dieReason = reason;
+        game.global.score.result = result;
 
         if (result === 'lose') {
             game.global.gameOver = true;
@@ -417,8 +419,12 @@ gameState.prototype = {
     },
     saveUserScore: function() {
         if (users != null && username !== '') {
-            var exp = 1.588078296068942150949562488050183134398622151272156039170;
-            game.global.score.final = Math.ceil(Math.pow(game.global.score.maxHeight, exp));
+            if (game.global.score.result === 'win') {
+                game.global.score.final = 1000000;
+            } else if (game.global.score.result === 'lose') {
+                var exp = 1.588078296068942150949562488050183134398622151272156039170;
+                game.global.score.final = Math.ceil(Math.pow(game.global.score.maxHeight, exp));
+            }
             var current = game.global.score;
             var past = users[username]['score'];
             if ((current.final > past.final) ||

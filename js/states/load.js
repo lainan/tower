@@ -9,11 +9,11 @@ var loadState = {
         // IMÁGENES, SPRITES Y TILES
         // Menú
         game.load.image('game-logo', './assets/menu/play.png');
-        
+
         // Botones virtuales
-        game.load.spritesheet('buttonvertical', 'assets/buttons/button-vertical.png', 64, 64);
-        game.load.spritesheet('buttonhorizontal', 'assets/buttons/button-horizontal.png', 96, 64);
-        game.load.spritesheet('buttonjump', 'assets/buttons/button-round-b.png', 96, 96);
+        // game.load.spritesheet('btn-vertical', 'assets/buttons/button-vertical.png', 64, 64);
+        game.load.spritesheet('btn-horizontal', 'assets/buttons/button-horizontal.png', 96, 64);
+        game.load.spritesheet('btn-jump', 'assets/buttons/button-round-b.png', 96, 96);
 
         // Sprites del juego
         game.load.image('background', 'assets/sprites/background.png');

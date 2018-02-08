@@ -70,7 +70,11 @@ var menuState = {
                         maxHeight: 0,
                         totalJumps: 0,
                         totalDegrees: 0,
-                        dieReason: 'none'
+                        largestDrop: 0,
+                        dieReason: 'none',
+                        result: 'none',
+                        seed: 'none',
+                        versionGame: 'v0.99.1'
                     }
                 };
                 localStorage.setItem('towerUsers', JSON.stringify(users));
@@ -80,7 +84,7 @@ var menuState = {
 
         });
 
-        var titleLabel = game.add.text(screenWidth / 2, 250, 'tower', {font: '200px Courier', fill: '#ffffff'});
+        var titleLabel = game.add.text(screenWidth / 2, screenHeight / 2 - 200, 'tower', {font: '200px Courier', fill: '#ffffff'});
         titleLabel.anchor.setTo(0.5);
 
         var startLabel = game.add.text(screenWidth / 2, screenHeight / 2, 'START', {font: '60px Courier', fill: '#ffffff'});
@@ -153,8 +157,6 @@ var menuState = {
             users[username].avatar +
             '.jpg" class="avatar-panel">');
 
-        console.log(users[username]);
-
         $('#scores-panel').append(
             'Puntuación: ' +
             users[username].score.final + '<br/>' +
@@ -172,5 +174,17 @@ var menuState = {
     },
     showScores: function() {
         $('#scores').css('display', 'block');
+    },
+    parseGameVersion: function(versionString) {
+        var versionRegex = /v(\d+).?(\d+)?.?(\d+)?/;
+        var match = versionRegex.exec(versionString);
+        var version = [];
+        var v1 = match[1];
+        var v2 = match[2];
+        var v3 = match[3];
+        version.push(v1 !== undefined ? v1: 0);
+        version.push(v2 !== undefined ? v2: 0);
+        version.push(v3 !== undefined ? v3: 0);
+        return version;
     }
 };
