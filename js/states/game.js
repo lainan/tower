@@ -61,6 +61,9 @@ gameState.prototype = {
 
         this.player = new Player(game, game.world.centerX, game.world.height - 250);
         // this.shadows.add(game.add.sprite(game, game.world.centerX, this.player.y, game.cache.getBitmapData('ball-shadow')));
+        this.player.body.onWorldBounds = new Phaser.Signal();
+        this.player.body.onWorldBounds.add(this.hitWorldBounds, this);
+
         game.camera.follow(this.player);
         game.camera.x = game.world.centerX;
         game.camera.y = game.world.centerY - 500;
@@ -374,21 +377,37 @@ gameState.prototype = {
     enemyHitsPlayer: function(player, enemy) {
         game.camera.shake(0.01, 500);
         game.camera.flash(0xd50000, 600);
-        this.endGame('Worm');
+        this.endGame('lose', 'Worm');
     },
-    endGame: function(reason) {
+    hitWorldBounds: function(sprite, up, down, left, right) {
+        if (up === true) {
+            this.endGame('win', 'none');
+        }
+    },
+    endGame: function(result, reason) {
         game.global.score.timePlayed = game.global.gameTimer.seconds;
         game.global.score.dieReason = reason;
-        game.global.gameOver = true;
 
-        game.camera.shake(0.01, 500);
-        game.camera.flash(0xd50000, 600);
+        if (result === 'lose') {
+            game.global.gameOver = true;
+            game.camera.shake(0.01, 500);
+            game.camera.flash(0xd50000, 600);
 
-        var gameOver = game.add.text(screenWidth / 2, screenHeight / 2, 'GAME OVER', {font: '10vw Courier', fill: '#ffffff'});
-        gameOver.anchor.setTo(0.5);
-        gameOver.inputEnabled = true;
-        gameOver.fixedToCamera = true;
-        gameOver.events.onInputDown.add(this.restartGame, this);
+            var gameOver = game.add.text(screenWidth / 2, screenHeight / 2, 'GAME OVER', {font: '15vw Courier', fill: '#ffffff'});
+            gameOver.anchor.setTo(0.5);
+            gameOver.inputEnabled = true;
+            gameOver.fixedToCamera = true;
+            gameOver.events.onInputDown.add(this.restartGame, this);
+
+        } else if (result === 'win') {
+
+            var gameOver = game.add.text(screenWidth / 2, screenHeight / 2, '¡YOU WIN!', {font: '15vw Courier', fill: '#ffffff'});
+            gameOver.anchor.setTo(0.5);
+            gameOver.inputEnabled = true;
+            gameOver.fixedToCamera = true;
+            gameOver.events.onInputDown.add(this.restartGame, this);
+
+        }
 
         this.saveUserScore();
     },
