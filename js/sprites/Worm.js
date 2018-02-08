@@ -14,13 +14,16 @@ var Worm = function (game, y, length) {
 
     this.head = this.getAt(0);
     this.tail = this.getAt(length-1);
-    this.wormBody =  this.getAll(null, null, 1, length-1);
+    this.wormBody =  this.getAll(null, null, 1, length - 1);
+    this.head.scale.y = 0.95;
+    this.tail.scale.y = 0.95;
+    this.tail = this.getAt(length-1);
     this.head.tweenBreathing = game.add.tween(this.head.scale)
-        .to( {y: 1.5 }, 250, Phaser.Easing.Cubic.Out, true)
+        .to( {y: 1.4 }, 250, Phaser.Easing.Cubic.Out, true)
         .yoyo(true, 0)
         .loop(true);
     this.tail.tweenBreathing = game.add.tween(this.tail.scale)
-        .to( {y: 1.5 }, 250, Phaser.Easing.Cubic.Out, true)
+        .to( {y: 1.4 }, 250, Phaser.Easing.Cubic.Out, true)
         .yoyo(true, 0)
         .loop(true);
 

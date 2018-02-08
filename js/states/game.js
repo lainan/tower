@@ -24,7 +24,8 @@ gameState.prototype = {
                 totalDegrees: 0,
                 largestDrop: 0,
                 dieReason: 'none',
-                versionGame: 'v0.99'
+                seed: 'none',
+                versionGame: 'v0.999'
             },
             gameOver: false,
             cheats: {
@@ -41,8 +42,13 @@ gameState.prototype = {
         this.generateTextureShadow('ball');
     },
     create: function () {
-        game.world.setBounds(0, 0, screenWidth, screenHeight * 6);
-
+        game.world.setBounds(0, 0, screenWidth, 1000 * 6 + 20);
+        this.seed = [
+            'paint', 'gold', 'teeth', 'nuclear', 'hollow', 'death', 'flask',
+            'mania', 'snap', 'souls'
+        ];
+        game.global.score.seed = game.rnd.pick(this.seed);
+        this.random = new Phaser.RandomDataGenerator(game.global.score.seed);
         this.background = new Background(game);
         this.tower = new Tower(game);
 
@@ -59,6 +65,7 @@ gameState.prototype = {
         game.camera.x = game.world.centerX;
         game.camera.y = game.world.centerY - 500;
         game.physics.arcade.gravity.y = 1200;
+        game.global.p = this.player;
 
         // CONTROLES
         // Teclado
@@ -137,8 +144,8 @@ gameState.prototype = {
             game.physics.arcade.collide(this.player, this.movingPlatforms);
             game.physics.arcade.collide(this.player, this.worm.wormBody);
 
-            game.physics.arcade.overlap(this.player, this.worm.head, this.endGame, null, this);
-            game.physics.arcade.overlap(this.player, this.worm.tail, this.endGame, null, this);
+            game.physics.arcade.overlap(this.player, this.worm.head, this.enemyHitsPlayer, null, this);
+            game.physics.arcade.overlap(this.player, this.worm.tail, this.enemyHitsPlayer, null, this);
         }
 
         // Controles
@@ -228,39 +235,40 @@ gameState.prototype = {
     // GENERACIÓN DE NIVELES
     generateLevel: function() {
         // 3 Niveles (1: fácil, 2: medio, 3: difícil)
-        // Altura nivel 1: 1 x screenHeight
-        // Altura nivel 2: 2 x screenHeight
-        // Altura nivel 3: 3 x screenHeight
         var lvl = {
             I: {
-                startPoint: game.world.bounds.height - screenHeight,
-                endPoint: game.world.bounds.height - 100
+                startHeight: game.world.bounds.height - 120,
+                maxLenght: 1500
             },
             II: {
-                startPoint: game.world.bounds.height - (3 * screenHeight),
-                endPoint: game.world.bounds.height - screenHeight
+                maxLenght: 2000
             },
             III: {
-                startPoint: 0,
-                endPoint: game.world.bounds.height - (3 * screenHeight)
+                maxLenght: 2000
             }
         };
 
-        // Nivel 1
-        var finalAngle = this.createMixStairs(lvl.I.startPoint, lvl.I.endPoint, 70, 0, 25, 2);
-        finalAngle =  (Math.round(finalAngle) + 20) % 360
-        // Nivel 2
-        this.worm = new Worm(game, lvl.I.endPoint + 50, 10);
+        this.worm = new Worm(game, lvl.I.startHeight + 65, 10);
         this.worm.forEach(function(wormSection) {
             this.shadows.add(new Shadow(game, wormSection, -10));
         }, this);
-        finalAngle = this.createMixStairs(lvl.II.startPoint - 300, lvl.II.endPoint, 70, finalAngle, 20, 3);
-        finalAngle =  (Math.round(finalAngle) + 90) % 360
+
+        // this.worms.add(new Worm(game, lvl.I.endHeight + 65, 10));
+        // this.worms.forEach(function(worm) {
+        //     worm.forEach(function(wormSection) {
+        //         this.shadows.add(new Shadow(game, wormSection, -10));
+        //     }, this);
+        // }, this);
+
+        // Nivel 1
+        var previousEnd = this.createMixStairs(lvl.I.startHeight, lvl.I.maxLenght, 72, 0, 25, 1);
+        // Nivel 2
+        previousEnd = this.createMixStairs(previousEnd.height, lvl.II.maxLenght, 72, previousEnd.angle, 25, 2);
         // Nivel 3
-        finalAngle = this.createMixStairs(lvl.III.startPoint, lvl.III.endPoint, 70, finalAngle, 20, 5);
-        finalAngle =  (Math.round(finalAngle) + 20) % 360
+        previousEnd = this.createMixStairs(previousEnd.height, lvl.III.maxLenght, 72, previousEnd.angle, 25, 3);
 
-
+        var previousAngle = this.createStairs(previousEnd.height, 168, 50, previousEnd.angle, 20);
+        this.createFloor(168, previousAngle, 11);
 
         game.world.bringToTop(this.shadows);
         game.world.bringToTop(game.global.sparksGroup);
@@ -269,59 +277,32 @@ gameState.prototype = {
         game.world.bringToTop(game.global.dustGroup);
         game.world.bringToTop(this.worm);
     },
-    // Crea una serie de plataformas en diagonal, devuelve el ángulo de la última plataforma colocada
-    createStairs: function(startingPoint, endPoint, offsetY, startingAngle, offsetAngle) {
-        var length = endPoint -startingPoint;
-        var endAngle = startingAngle + (((length / offsetY) - 1) * offsetAngle) % 359;
-        for (var i = 0; i < (length / offsetY); i++) {
-            this.platforms.add(new Platform(
-                game,
-                startingAngle + (i * offsetAngle) % 359,
-                startingPoint + (i * offsetY)
-            ));
-            this.shadows.add(new Shadow(game, this.platforms.getAt(i), -10));
-        }
-        return endAngle;
-    },
-    // Igual que el método de arriba pero para plataformas que se mueven
-    createMovingStairs: function(startingPoint, endPoint, offsetY, startingAngle, offsetAngle) {
-        var length = endPoint -startingPoint;
-        var endAngle = startingAngle + (((length / offsetY) - 1) * offsetAngle) % 359;
-        for (var i = 0; i < (length / offsetY); i++) {
-            var movement = {
-                finalAngle: getRandomInt(15, 35),
-                updateRate: 2,
-                angleSpeed: 1,
-                forward: Math.random() > 0.5 ? true: false,
-            };
-            this.movingPlatforms.add(new MovingPlatform(
-                game,
-                startingAngle +  (i * offsetAngle) % 359,
-                startingPoint + (i * offsetY),
-                movement)
-            );
-            this.shadows.add(new Shadow(game, this.movingPlatforms.getAt(i), -10));
-        }
-    },
-    createWorms: function(startingPoint, endPoint, offsetY, startingAngle, offsetAngle) {
-
-    },
     createMixStairs: function(
-        startingPoint, endPoint, offsetY,
-        startingAngle, offsetAngle,
+        startHeight, length, offsetY,
+        startAngle, offsetAngle,
         frecuencyMP, maxSpeedMP
     ) {
-        var length = endPoint - startingPoint;
-        var newPlatform;
-        var totalAngle = 0;
-        var nextFinalAngle = 0;
-        var lastFinalAngle = 0;
+        frecuencyMP += 1;
         maxSpeedMP = maxSpeedMP ? maxSpeedMP: 1;
-        for (var i = 0; i < Math.round(length / offsetY); i++) {
+
+        var steps = Math.round(length / offsetY);
+        // Para que siempre haya una plataforma no móbil al principio y final
+        // de cada sección generada sumamos el número de pasos necesarios
+        if (steps % frecuencyMP !== 0) {
+            steps = Math.floor(steps / frecuencyMP) * frecuencyMP;
+        }
+
+        var newPlatform;
+        var nextAngle = startAngle;
+        var nextFinalAngle = 0;
+        var currentFinalAngle = 0;
+        for (var i = 0; i < steps; i++) {
             if (i % frecuencyMP > 0) {
-                // Para evitar saltos imposibles
-                while(nextFinalAngle === lastFinalAngle) {
-                    nextFinalAngle = getRandomInt(5, 45);
+                // Para evitar que las plataformas estén sicronizadas y se
+                // creen saltos imposibles hacemos que el ángulo de la proxima
+                // plataforma sea distinto al anterior
+                while (nextFinalAngle === currentFinalAngle) {
+                    nextFinalAngle = this.getRandomFinalAngle();
                 }
                 var movement = {
                     finalAngle: nextFinalAngle,
@@ -329,31 +310,75 @@ gameState.prototype = {
                     angleSpeed: getRandomInt(1, maxSpeedMP),
                     forward: false,
                 };
-                lastFinalAngle = movement.finalAngle;
+                currentFinalAngle = movement.finalAngle;
                 newPlatform = new MovingPlatform(game,
-                    startingAngle +  (totalAngle) % 359,
-                    endPoint - (i * offsetY),
+                    nextAngle,
+                    startHeight - (i * offsetY),
                     movement);
-                totalAngle += (offsetAngle + lastFinalAngle);
+                nextAngle = (nextAngle + (offsetAngle + currentFinalAngle)) % 359;
                 this.movingPlatforms.add(newPlatform);
                 this.shadows.add(new Shadow(game, newPlatform, -10));
             } else {
                 newPlatform = new Platform(game,
-                    startingAngle + (totalAngle) % 359,
-                    endPoint - (i * offsetY)
+                    nextAngle,
+                    startHeight - (i * offsetY)
                 )
-                totalAngle += offsetAngle;
+                nextAngle = (nextAngle + offsetAngle) % 359;
                 this.platforms.add(newPlatform);
                 this.shadows.add(new Shadow(game, newPlatform, -10));
             }
         }
-        return totalAngle;
+        return {
+            angle: nextAngle % 359,
+            height: newPlatform.y - offsetY
+        };
+    },
+    // Genera un número aleatorio con un sesgo determinado
+    getRandomFinalAngle: function() {
+        return this.random.integerInRange(10, 45);
+    },
+    // Crea una serie de plataformas en diagonal, devuelve el ángulo de la última plataforma colocada
+    createStairs: function(startHeight, endHeight, offsetY, startAngle, offsetAngle) {
+        var length = startHeight - endHeight;
+        var steps = Math.round(length / offsetY);
+        var endAngle = startAngle + ((length / offsetY) * offsetAngle) % 359;
+        for (var i = 0; i < steps; i++) {
+            var newPlatform = new Platform(
+                game,
+                Math.round((startAngle + (i * offsetAngle)) % 359),
+                startHeight - (i * offsetY)
+            );
+            this.platforms.add(newPlatform);
+            this.shadows.add(new Shadow(game, newPlatform, - 10));
+        }
+        return endAngle;
+    },
+    createFloor: function(height, startAngle, offsetAngle) {
+        var steps = Math.round((359 - 77) / (offsetAngle));
+        for (var i = 0; i < steps; i++) {
+            var newPlatform = new Platform(
+                game,
+                Math.round((startAngle + (i * offsetAngle)) % 359),
+                height
+            );
+            this.platforms.add(newPlatform);
+            this.shadows.add(new Shadow(game, newPlatform, - 10));
+        }
+    },
+    createWorms: function(startHeight, endHeight, offsetY, startAngle, offsetAngle) {
+
     },
     showMenu: function() {
-            
+
     },
-    endGame: function(player, enemy) {
+    enemyHitsPlayer: function(player, enemy) {
+        game.camera.shake(0.01, 500);
+        game.camera.flash(0xd50000, 600);
+        this.endGame('Worm');
+    },
+    endGame: function(reason) {
         game.global.score.timePlayed = game.global.gameTimer.seconds;
+        game.global.score.dieReason = reason;
         game.global.gameOver = true;
 
         game.camera.shake(0.01, 500);
@@ -385,5 +410,9 @@ gameState.prototype = {
                 localStorage.setItem('towerUsers', JSON.stringify(users));
             }
         }
+    },
+    restartGame: function() {
+        game.global.gameOver = false;
+        game.state.restart();
     }
 };

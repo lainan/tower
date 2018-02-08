@@ -1,4 +1,4 @@
-/* global $, Phaser, game, screenWidth, screenHeight */
+/* global $, game, screenWidth, screenHeight */
 
 // eslint-disable-next-line no-unused-vars
 
@@ -66,7 +66,7 @@ var menuState = {
                     'avatar': avatar,
                     'score': {
                         final: 0,
-                        finalTime: 0,
+                        timePlayed: 0,
                         maxHeight: 0,
                         totalJumps: 0,
                         totalDegrees: 0,
@@ -118,12 +118,11 @@ var menuState = {
         var sortedScores = [];
         for (var user in users) {
             if (users.hasOwnProperty(user)) {
-                if (users[user].score != null &&
-                    $.isEmptyObject(users[user].score) === false) {
-                        sortedScores.push({
-                            username: user,
-                            score: users[user].score
-                        });
+                if (users[user].score != null && $.isEmptyObject(users[user].score) === false) {
+                    sortedScores.push({
+                        username: user,
+                        score: users[user].score
+                    });
                 }
             }
         }
@@ -148,7 +147,7 @@ var menuState = {
     },
     fillScorePanel: function(username) {
         $('#scores-panel').empty();
-        
+
         $('#scores-panel').append(
             '<img src="assets/menu/' +
             users[username].avatar +
@@ -160,7 +159,7 @@ var menuState = {
             'Puntuación: ' +
             users[username].score.final + '<br/>' +
             'Tiempo: ' +
-            users[username].score.finalTime + 's <br/>' +
+            users[username].score.timePlayed + 's <br/>' +
             'Altura: ' +
             Math.round(users[username].score.maxHeight * 0.0167) + 'm <br/>' +
             'Saltos totales: ' +
