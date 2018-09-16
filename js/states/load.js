@@ -22,6 +22,8 @@ var loadState = {
         game.load.atlas('platform', 'assets/sprites/platform.png', 'assets/sprites/platform.json');
         game.load.atlas('platform-metal', 'assets/sprites/platform-metal.png', 'assets/sprites/platform-metal.json');
         game.load.atlas('worm', 'assets/sprites/worm.png', 'assets/sprites/worm.json');
+        game.load.atlas('can', 'assets/sprites/can.png', 'assets/sprites/can.json');
+
 
         // Partículas
         game.load.image('track', 'assets/sprites/track.png');

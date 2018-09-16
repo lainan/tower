@@ -4,8 +4,6 @@
 
 /* eslint no-unused-vars: 0 */
 
-'use strict';
-
 // MODIFICACIONES DE OBJETOS INCORPORADOS (standard built-in objects)
 
 /**

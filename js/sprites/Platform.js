@@ -20,6 +20,7 @@ var Platform = function (game, angleOffset, y = game.world.centerY) {
     this.body.setSize(70, 18);
     this.body.immovable = true;
     this.body.allowGravity = false;
+
     this.updateState();
     game.add.existing(this);
 };
@@ -44,7 +45,7 @@ Platform.prototype.updateLocation = function() {
     if (this.angleFinal.between(91, 136)) {
         this.x = this.game.world.centerX + this.pivotRadius;
     } else if (this.angleFinal.between(225, 269)) {
-        this.x = this.game.world.centerX -this.pivotRadius;
+        this.x = this.game.world.centerX - this.pivotRadius;
     }
 };
 

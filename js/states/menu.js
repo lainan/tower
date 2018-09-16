@@ -98,6 +98,8 @@ var menuState = {
         scoresLabel.anchor.setTo(0.5);
 
         this.fillScores();
+
+        menuState.startGame();
     },
     startGame: function() {
         game.state.start('game');

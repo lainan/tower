@@ -62,8 +62,8 @@ gameState.prototype = {
 
         this.player = new Player(game, game.world.centerX, game.world.height - 250);
         // this.shadows.add(game.add.sprite(game, game.world.centerX, this.player.y, game.cache.getBitmapData('ball-shadow')));
-        this.player.body.onWorldBounds = new Phaser.Signal();
-        this.player.body.onWorldBounds.add(this.hitWorldBounds, this);
+
+        this.can = new Can(game, 210, 118);
 
         game.camera.follow(this.player);
         game.camera.x = game.world.centerX;
@@ -79,7 +79,8 @@ gameState.prototype = {
             left:  game.input.keyboard.addKey(Phaser.Keyboard.LEFT),
             right: game.input.keyboard.addKey(Phaser.Keyboard.RIGHT),
             jump:  game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR),
-            esc:   game.input.keyboard.addKey(Phaser.Keyboard.ESC)
+            esc:   game.input.keyboard.addKey(Phaser.Keyboard.ESC),
+            h:     game.input.keyboard.addKey(Phaser.Keyboard.H)
         };
         // Virtual
         game.global.virtual = {
@@ -147,9 +148,13 @@ gameState.prototype = {
             game.physics.arcade.collide(this.player, this.platforms);
             game.physics.arcade.collide(this.player, this.movingPlatforms);
             game.physics.arcade.collide(this.player, this.worm.wormBody);
+            
+            if (game.global.cheats.nodeath === false) {
+                game.physics.arcade.overlap(this.player, this.worm.head, this.enemyHitsPlayer, null, this);
+                game.physics.arcade.overlap(this.player, this.worm.tail, this.enemyHitsPlayer, null, this);
+            }
 
-            game.physics.arcade.overlap(this.player, this.worm.head, this.enemyHitsPlayer, null, this);
-            game.physics.arcade.overlap(this.player, this.worm.tail, this.enemyHitsPlayer, null, this);
+            game.physics.arcade.overlap(this.player, this.can, this.playerWinsGame, null, this);
         }
 
         // Controles
@@ -190,6 +195,7 @@ gameState.prototype = {
             this.background.move(game.global.lastMove);
             this.tower.updateState();
             this.platforms.callAll('updateState', null);
+            this.can.updateState();
             this.platforms.sort('depth', Phaser.Group.SORT_ASCENDING);
         }
 
@@ -199,6 +205,10 @@ gameState.prototype = {
             game.global.gameOver === false
         ) {
             this.player.jump();
+        }
+
+        if (this.keyboard.h.justPressed()) {
+            this.activateCheats();
         }
 
         if (this.keyboard.esc.justPressed()) {
@@ -369,21 +379,16 @@ gameState.prototype = {
             this.shadows.add(new Shadow(game, newPlatform, - 10));
         }
     },
-    createWorms: function(startHeight, endHeight, offsetY, startAngle, offsetAngle) {
-
-    },
-    showMenu: function() {
-
-    },
+    createWorms: function(startHeight, endHeight, offsetY, startAngle, offsetAngle) { },
+    showMenu: function() { },
+    // ACCIONES
     enemyHitsPlayer: function(player, enemy) {
         game.camera.shake(0.01, 500);
         game.camera.flash(0xd50000, 600);
         this.endGame('lose', 'Worm');
     },
-    hitWorldBounds: function(sprite, up, down, left, right) {
-        if (up === true) {
-            this.endGame('win', 'none');
-        }
+    playerWinsGame: function(player, can) {
+        this.endGame('win', 'none');
     },
     endGame: function(result, reason) {
         game.global.score.timePlayed = game.global.gameTimer.seconds;
@@ -395,20 +400,19 @@ gameState.prototype = {
             game.camera.shake(0.01, 500);
             game.camera.flash(0xd50000, 600);
 
-            var gameOver = game.add.text(screenWidth / 2, screenHeight / 2, 'GAME OVER', {font: '15vw Courier', fill: '#ffffff'});
-            gameOver.anchor.setTo(0.5);
-            gameOver.inputEnabled = true;
-            gameOver.fixedToCamera = true;
-            gameOver.events.onInputDown.add(this.restartGame, this);
+            var gameOverText = game.add.text(screenWidth / 2, screenHeight / 2, 'GAME OVER', {font: '15vw Courier', fill: '#ffffff'});
+            gameOverText.anchor.setTo(0.5);
+            gameOverText.inputEnabled = true;
+            gameOverText.fixedToCamera = true;
+            gameOverText.events.onInputDown.add(this.restartGame, this);
 
         } else if (result === 'win') {
-
-            var gameOver = game.add.text(screenWidth / 2, screenHeight / 2, '¡YOU WIN!', {font: '15vw Courier', fill: '#ffffff'});
-            gameOver.anchor.setTo(0.5);
-            gameOver.inputEnabled = true;
-            gameOver.fixedToCamera = true;
-            gameOver.events.onInputDown.add(this.restartGame, this);
-
+            game.global.gameOver = true;
+            var gameOverText = game.add.text(screenWidth / 2, screenHeight / 2, '¡YOU WIN!', {font: '15vw Courier', fill: '#ffffff'});
+            gameOverText.anchor.setTo(0.5);
+            gameOverText.inputEnabled = true;
+            gameOverText.fixedToCamera = true;
+            gameOverText.events.onInputDown.add(this.restartGame, this);
         }
 
         this.saveUserScore();
@@ -437,7 +441,11 @@ gameState.prototype = {
         }
     },
     restartGame: function() {
-        game.global.gameOver = false;
+        game.global.gameOver
         game.state.restart();
+    },
+    activateCheats: function() {
+        game.global.cheats.fly = true;
+        game.global.cheats.nodeath = true;
     }
 };
