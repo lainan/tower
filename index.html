@@ -16,6 +16,10 @@
         <script type="text/javascript" src="lib/jquery-3.3.1.slim.js"></script>
         <script type="text/javascript" src="lib/phaser.js"></script>
 
+        <script src="https://www.gstatic.com/firebasejs/5.5.0/firebase-app.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/5.5.0/firebase-auth.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/5.5.0/firebase-database.js"></script>
+
         <script type="text/javascript" src="js/states/boot.js"></script>
         <script type="text/javascript" src="js/states/load.js"></script>
         <script type="text/javascript" src="js/states/menu.js"></script>
@@ -43,38 +47,7 @@
     </head>
     <body>
         <div id="gameContainer"></div>
-
-        <div id="userform" class="modal">
-            <form class="modal-content animate">
-                <div class="img-container">
-                    <label><b>Avatar</b></label><br/>
-                    <img src="assets/menu/avatar1.jpg" alt="Avatar 1" class="avatar" id="avatar1">
-                    <img src="assets/menu/avatar2.jpg" alt="Avatar 2" class="avatar" id="avatar2">
-                    <img src="assets/menu/avatar3.jpg" alt="Avatar 3" class="avatar" id="avatar3">
-                    <img src="assets/menu/avatar4.jpg" alt="Avatar 4" class="avatar" id="avatar4">
-                    <img src="assets/menu/avatar5.jpg" alt="Avatar 5" class="avatar" id="avatar5">
-                </div>
-
-                <div class="container">
-                    <span class="error-msg" title="Mensaje de error" id="error-msg"></span>
-                    <br/>
-                    <br/>
-                    <label><b>Username</b></label><br/>
-                    <input type="text" placeholder="Enter Username" name="uname" id="uname" required>
-                    <br/>
-                    <label><b>Password</b></label><br/>
-                    <input type="password" placeholder="Enter Password" name="psw" id="psw" required>
-                    <br/>
-                    <button type="submit" id="login">Login</button>
-                    <button type="submit" id="signup">Registrarse</button>
-                </div>
-
-                <div class="container footer">
-                    <button type="button" class="btn-cancel">Cancelar</button>
-                </div>
-            </form>
-        </div>
-
+        
         <div id="scores" class="modal">
             <div class="modal-content animate">
                 <div class="container">
@@ -88,4 +61,5 @@
             </div>
         </div>
     </body>
+
 </html>

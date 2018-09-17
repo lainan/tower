@@ -26,7 +26,7 @@ gameState.prototype = {
                 dieReason: 'none',
                 result: 'none',
                 seed: 'none',
-                versionGame: 'v0.99.1'
+                versionGame: versionGame
             },
             gameOver: false,
             cheats: {
@@ -207,9 +207,9 @@ gameState.prototype = {
             this.player.jump();
         }
 
-        if (this.keyboard.h.justPressed()) {
-            this.activateCheats();
-        }
+        // if (this.keyboard.h.justPressed()) {
+        //     this.activateCheats();
+        // }
 
         if (this.keyboard.esc.justPressed()) {
             game.state.restart();
@@ -400,19 +400,19 @@ gameState.prototype = {
             game.camera.shake(0.01, 500);
             game.camera.flash(0xd50000, 600);
 
-            var gameOverText = game.add.text(screenWidth / 2, screenHeight / 2, 'GAME OVER', {font: '15vw Courier', fill: '#ffffff'});
-            gameOverText.anchor.setTo(0.5);
-            gameOverText.inputEnabled = true;
-            gameOverText.fixedToCamera = true;
-            gameOverText.events.onInputDown.add(this.restartGame, this);
+            var gameOverLabel = game.add.text(screenWidth / 2, screenHeight / 2, 'GAME OVER', {font: '15vw Courier', fill: '#ffffff'});
+            gameOverLabel.anchor.setTo(0.5);
+            gameOverLabel.inputEnabled = true;
+            gameOverLabel.fixedToCamera = true;
+            gameOverLabel.events.onInputDown.add(this.restartGame, this);
 
         } else if (result === 'win') {
             game.global.gameOver = true;
-            var gameOverText = game.add.text(screenWidth / 2, screenHeight / 2, '¡YOU WIN!', {font: '15vw Courier', fill: '#ffffff'});
-            gameOverText.anchor.setTo(0.5);
-            gameOverText.inputEnabled = true;
-            gameOverText.fixedToCamera = true;
-            gameOverText.events.onInputDown.add(this.restartGame, this);
+            var gameOverLabel = game.add.text(screenWidth / 2, screenHeight / 2, '¡YOU WIN!', {font: '15vw Courier', fill: '#ffffff'});
+            gameOverLabel.anchor.setTo(0.5);
+            gameOverLabel.inputEnabled = true;
+            gameOverLabel.fixedToCamera = true;
+            gameOverLabel.events.onInputDown.add(this.restartGame, this);
         }
 
         this.saveUserScore();
@@ -422,7 +422,9 @@ gameState.prototype = {
         game.state.restart();
     },
     saveUserScore: function() {
-        if (users != null && username !== '') {
+        var userId = firebase.auth().currentUser.uid;
+
+        if (users != null) {
             if (game.global.score.result === 'win') {
                 game.global.score.final = 1000000;
             } else if (game.global.score.result === 'lose') {
@@ -430,13 +432,15 @@ gameState.prototype = {
                 game.global.score.final = Math.ceil(Math.pow(game.global.score.maxHeight, exp));
             }
             var current = game.global.score;
-            var past = users[username]['score'];
+            var past = users[userId]['score'];
             if ((current.final > past.final) ||
                 ((current.final === past.final) && (current.timePlayed < past.timePlayed))
             ) {
-                users[username]['score'] = game.global.score;
-                console.log(users, username);
-                localStorage.setItem('towerUsers', JSON.stringify(users));
+                users[userId]['score'] = game.global.score;
+
+                firebase.database().ref('users/' + userId).update({
+                    score: game.global.score
+                });
             }
         }
     },
