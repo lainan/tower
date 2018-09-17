@@ -6,6 +6,7 @@ var versionGame = 'v0.99.2';
 var users = {};
 var startLabel;
 var scoresLabel;
+var loadingLabel;
 
 // Initialize Firebase
 var config = {
@@ -39,16 +40,18 @@ var menuState = {
         var titleLabel = game.add.text(screenWidth / 2, screenHeight / 2 - 200, 'tower', {font: '200px Courier', fill: '#ffffff'});
         titleLabel.anchor.setTo(0.5);
 
-        var startLabel = game.add.text(screenWidth / 2, screenHeight / 2, 'START', {font: '60px Courier', fill: '#ffffff'});
+        loadingLabel = game.add.text(screenWidth / 2, screenHeight / 2, 'Loading...', {font: '60px Courier', fill: '#ffffff'});
+        loadingLabel.anchor.setTo(0.5);
+
+        startLabel = game.add.text(screenWidth / 2, screenHeight / 2, 'START', {font: '60px Courier', fill: '#ffffff'});
         startLabel.events.onInputDown.add(this.logIn, this);
         startLabel.anchor.setTo(0.5);
+        startLabel.visible = false;
 
-        var scoresLabel = game.add.text(screenWidth / 2, screenHeight / 2 + 120, 'SCORES', {font: '60px Courier', fill: '#ffffff'});
+        scoresLabel = game.add.text(screenWidth / 2, screenHeight / 2 + 120, 'SCORES', {font: '60px Courier', fill: '#ffffff'});
         scoresLabel.events.onInputDown.add(this.showScores, this);
         scoresLabel.anchor.setTo(0.5);
-
-        scoresLabel.inputEnabled = true;
-        startLabel.inputEnabled = true;
+        scoresLabel.visible = false;
 
         firebase.database().ref('/users').once('value').then(function(snapshot) {
             snapshot.forEach(function(childSnapshot) {
@@ -87,7 +90,7 @@ var menuState = {
                 firebase.database().ref('users/' + user.uid).update(newUser);
                 users[user.uid] = newUser;
             }
-            
+
         menuState.startGame();
 
         }).catch(function(error) {
@@ -158,6 +161,10 @@ var menuState = {
     enableButtons: function() {
         scoresLabel.inputEnabled = true;
         startLabel.inputEnabled = true;
+
+        startLabel.visible = true;
+        scoresLabel.visible = true;
+        loadingLabel.visible = false;
     },
     showScores: function() {
         $('#scores').css('display', 'block');
