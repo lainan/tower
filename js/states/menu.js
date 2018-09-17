@@ -4,6 +4,8 @@
 
 var versionGame = 'v0.99.2';
 var users = {};
+var startLabel;
+var scoresLabel;
 
 // Initialize Firebase
 var config = {
@@ -38,21 +40,22 @@ var menuState = {
         titleLabel.anchor.setTo(0.5);
 
         var startLabel = game.add.text(screenWidth / 2, screenHeight / 2, 'START', {font: '60px Courier', fill: '#ffffff'});
-        startLabel.inputEnabled = true;
         startLabel.events.onInputDown.add(this.logIn, this);
         startLabel.anchor.setTo(0.5);
 
         var scoresLabel = game.add.text(screenWidth / 2, screenHeight / 2 + 120, 'SCORES', {font: '60px Courier', fill: '#ffffff'});
-        scoresLabel.inputEnabled = true;
         scoresLabel.events.onInputDown.add(this.showScores, this);
         scoresLabel.anchor.setTo(0.5);
+
+        scoresLabel.inputEnabled = true;
+        startLabel.inputEnabled = true;
 
         firebase.database().ref('/users').once('value').then(function(snapshot) {
             snapshot.forEach(function(childSnapshot) {
                 var userData = childSnapshot.val();
                 users[userData.uid] = childSnapshot.val();
             });
-        }).then(this.fillScores);
+        }).then(this.fillScores).then(this.enableButtons);
     },
     startGame: function() {
         game.state.start('game');
@@ -79,10 +82,13 @@ var menuState = {
                     versionGame: versionGame
                 }
             }
-            firebase.database().ref('users/' + user.uid).update(newUser);
-            users[user.uid] = newUser;
 
-            menuState.startGame();
+            if (users[user.uid] === undefined) {
+                firebase.database().ref('users/' + user.uid).update(newUser);
+                users[user.uid] = newUser;
+            }
+            
+        menuState.startGame();
 
         }).catch(function(error) {
             var errorCode = error.code;
@@ -148,6 +154,10 @@ var menuState = {
             'Muerte: ' +
             users[uid].score.dieReason
         );
+    },
+    enableButtons: function() {
+        scoresLabel.inputEnabled = true;
+        startLabel.inputEnabled = true;
     },
     showScores: function() {
         $('#scores').css('display', 'block');
