@@ -70,7 +70,6 @@ var menuState = {
             var newUser = {
                 uid: user.uid,
                 username: user.displayName,
-                email: user.email,
                 avatar: user.photoURL,
                 score: {
                     final: 0,
@@ -96,7 +95,6 @@ var menuState = {
         }).catch(function(error) {
             var errorCode = error.code;
             var errorMessage = error.message;
-            var email = error.email;
             var credential = error.credential;
         });
     },
