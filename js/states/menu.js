@@ -61,8 +61,7 @@ var menuState = {
         firebase.auth().signInWithPopup(provider).then(function(result) {
             var token = result.credential.accessToken;
             var user = result.user;
-
-            firebase.database().ref('users/' + user.uid).update({
+            var newUser = {
                 uid: user.uid,
                 username: user.displayName,
                 email: user.email,
@@ -79,7 +78,9 @@ var menuState = {
                     seed: 'none',
                     versionGame: versionGame
                 }
-            });
+            }
+            firebase.database().ref('users/' + user.uid).update(newUser);
+            users[user.uid] = newUser;
 
             menuState.startGame();
 
