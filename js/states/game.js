@@ -26,9 +26,14 @@ gameState.prototype = {
                 dieReason: 'none',
                 result: 'none',
                 seed: 'none',
+                cheats: false,
                 versionGame: versionGame
             },
             gameOver: false,
+            settings: {
+                shadows: true,
+                effects: true
+            },
             cheats: {
                 fly: false,
                 nodeath: false
@@ -37,10 +42,15 @@ gameState.prototype = {
                 die: this.endGame
             }
         };
-        this.generateTextureShadow('platform');
-        this.generateTextureShadow('platform-metal');
-        this.generateTextureShadow('worm');
-        this.generateTextureShadow('ball');
+
+        this.loadUserSettings();
+
+        if (game.global.settings.shadows === true) {
+            this.generateTextureShadow('platform');
+            this.generateTextureShadow('platform-metal');
+            this.generateTextureShadow('worm');
+            this.generateTextureShadow('ball');
+        }
     },
     create: function () {
         game.world.setBounds(0, 0, screenWidth, 1000 * 6);
@@ -88,7 +98,7 @@ gameState.prototype = {
             right: false,
             jump:  false,
         }
-        // Mando XBOX
+        // Mando
         game.input.gamepad.start();
         this.gamepad = game.input.gamepad.pad1;
 
@@ -263,10 +273,11 @@ gameState.prototype = {
         };
 
         this.worm = new Worm(game, lvl.I.startHeight + 65, 10);
-        this.worm.forEach(function(wormSection) {
-            this.shadows.add(new Shadow(game, wormSection, -10));
-        }, this);
-
+        if (game.global.settings.shadows === true) {
+            this.worm.forEach(function(wormSection) {
+                this.shadows.add(new Shadow(game, wormSection, -10));
+            }, this);
+        }
         // this.worms.add(new Worm(game, lvl.I.endHeight + 65, 10));
         // this.worms.forEach(function(worm) {
         //     worm.forEach(function(wormSection) {
@@ -331,7 +342,11 @@ gameState.prototype = {
                     movement);
                 nextAngle = (nextAngle + (offsetAngle + currentFinalAngle)) % 359;
                 this.movingPlatforms.add(newPlatform);
-                this.shadows.add(new Shadow(game, newPlatform, -10));
+
+                if (game.global.settings.shadows === true) {
+                    this.shadows.add(new Shadow(game, newPlatform, -10));
+                }
+                
             } else {
                 newPlatform = new Platform(game,
                     nextAngle,
@@ -339,7 +354,9 @@ gameState.prototype = {
                 )
                 nextAngle = (nextAngle + offsetAngle) % 359;
                 this.platforms.add(newPlatform);
-                this.shadows.add(new Shadow(game, newPlatform, -10));
+                if (game.global.settings.shadows === true) {
+                    this.shadows.add(new Shadow(game, newPlatform, -10));
+                }
             }
         }
         return {
@@ -363,7 +380,9 @@ gameState.prototype = {
                 startHeight - (i * offsetY)
             );
             this.platforms.add(newPlatform);
-            this.shadows.add(new Shadow(game, newPlatform, - 10));
+            if (game.global.settings.shadows === true) {
+                this.shadows.add(new Shadow(game, newPlatform, - 10));
+            }
         }
         return endAngle;
     },
@@ -376,7 +395,9 @@ gameState.prototype = {
                 height
             );
             this.platforms.add(newPlatform);
-            this.shadows.add(new Shadow(game, newPlatform, - 10));
+            if (game.global.settings.shadows === true) {
+                this.shadows.add(new Shadow(game, newPlatform, - 10));
+            }
         }
     },
     createWorms: function(startHeight, endHeight, offsetY, startAngle, offsetAngle) { },
@@ -414,17 +435,21 @@ gameState.prototype = {
             gameOverLabel.fixedToCamera = true;
             gameOverLabel.events.onInputDown.add(this.restartGame, this);
         }
-
-        this.saveUserScore();
     },
     restartGame: function() {
+        this.saveUserScore();
         game.global.gameOver = false;
         game.state.restart();
+    },
+    loadUserSettings: function() {
+        if (users !== null) {
+            game.global.settings = settingsMenu;
+        }
     },
     saveUserScore: function() {
         var userId = firebase.auth().currentUser.uid;
 
-        if (users != null) {
+        if (users !== null) {
             if (game.global.score.result === 'win') {
                 game.global.score.final = 1000000;
             } else if (game.global.score.result === 'lose') {
@@ -433,23 +458,23 @@ gameState.prototype = {
             }
             var current = game.global.score;
             var past = users[userId]['score'];
-            if ((current.final > past.final) ||
-                ((current.final === past.final) && (current.timePlayed < past.timePlayed))
+            if (((current.final > past.final) ||
+                ((current.final === past.final) && (current.timePlayed < past.timePlayed))) &&
+                (current.cheats === false && game.global.cheats.fly === false && game.global.cheats.fly === false)
             ) {
                 users[userId]['score'] = game.global.score;
 
                 firebase.database().ref('users/' + userId).update({
-                    score: game.global.score
+                    score: game.global.score,
+                    settings: game.global.settings,
+                    lastUpdate: firebase.database.ServerValue.TIMESTAMP
                 });
             }
         }
     },
-    restartGame: function() {
-        game.global.gameOver
-        game.state.restart();
-    },
     activateCheats: function() {
         game.global.cheats.fly = true;
         game.global.cheats.nodeath = true;
+        game.global.score.cheats = true;
     }
 };

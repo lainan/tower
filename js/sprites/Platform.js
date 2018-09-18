@@ -67,5 +67,7 @@ Platform.prototype.updateState = function() {
     this.updateLocation();
     this.updateFrame();
     this.depth = Math.abs(this.angleFinal - 180);
-    this.updateShadow();
+    if (game.global.settings.shadows === true) {
+        this.updateShadow();
+    }
 };

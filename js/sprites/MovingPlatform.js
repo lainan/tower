@@ -24,45 +24,47 @@ var MovingPlatform = function (game, angleOffset, y = game.world.centerY, moveme
     this.movement.currentAngle = 0;
     this.movement.tick = 0;
 
-    this.sparks = {
-        parent: this,
-        left: {
-            e: game.add.emitter(0, 0, 50),
-            x: -22,
-            y: 20
-        },
-        right: {
-            e: game.add.emitter(0, 0, 50),
-            x: 22,
-            y: 20
-        },
-        updateState: function() {
-            var p = this.parent;
-            var g = p.game;
-            var x = g.world.centerX + ((g.global.towerWidth / 2) * Math.sin(p.angleFinal * Math.PI / 180));
-            this.left.e.emitX = x + (this.left.x * Math.cos(p.angleFinal * Math.PI / 180));
-            this.left.e.emitY = p.y + this.left.y;
-            this.right.e.emitX = x + (this.right.x * Math.cos(p.angleFinal * Math.PI / 180));
-            this.right.e.emitY = p.y + this.right.y;
-            if (p.angleFinal.between(0, 90) || p.angleFinal.between(270, 359)) {
-                this.left.e.on = true;
-                this.right.e.on = true;
-            } else {
-                this.left.e.on = false;
-                this.right.e.on = false;
+    if (game.global.settings.effects === true) {
+        this.sparks = {
+            parent: this,
+            left: {
+                e: game.add.emitter(0, 0, 50),
+                x: -22,
+                y: 20
+            },
+            right: {
+                e: game.add.emitter(0, 0, 50),
+                x: 22,
+                y: 20
+            },
+            updateState: function() {
+                var p = this.parent;
+                var g = p.game;
+                var x = g.world.centerX + ((g.global.towerWidth / 2) * Math.sin(p.angleFinal * Math.PI / 180));
+                this.left.e.emitX = x + (this.left.x * Math.cos(p.angleFinal * Math.PI / 180));
+                this.left.e.emitY = p.y + this.left.y;
+                this.right.e.emitX = x + (this.right.x * Math.cos(p.angleFinal * Math.PI / 180));
+                this.right.e.emitY = p.y + this.right.y;
+                if (p.angleFinal.between(0, 90) || p.angleFinal.between(270, 359)) {
+                    this.left.e.on = true;
+                    this.right.e.on = true;
+                } else {
+                    this.left.e.on = false;
+                    this.right.e.on = false;
+                }
             }
-        }
-    };
-
-    var sparks = this.sparks;
-    $.each(['left', 'right'], function(i, v) {
-        sparks[v].e.makeParticles('spark');
-        sparks[v].e.gravity = 200;
-        sparks[v].e.minParticleScale = 0.1;
-        sparks[v].e.maxParticleScale = 0.6;
-        sparks[v].e.start(false, 150, 1);
-        game.global.sparksGroup.add(sparks[v].e);
-    });
+        };
+    
+        var sparks = this.sparks;
+        $.each(['left', 'right'], function(i, v) {
+            sparks[v].e.makeParticles('spark');
+            sparks[v].e.gravity = 200;
+            sparks[v].e.minParticleScale = 0.1;
+            sparks[v].e.maxParticleScale = 0.6;
+            sparks[v].e.start(false, 150, 1);
+            game.global.sparksGroup.add(sparks[v].e);
+        });
+    }
 
     this.updateState();
     game.add.existing(this);
@@ -96,8 +98,12 @@ MovingPlatform.prototype.updateState = function() {
     this.updateFrame();
     this.depth = Math.abs(this.angleFinal - 180);
 
-    this.sparks.updateState();
-    this.updateShadow();
+    if (game.global.settings.effects === true) {
+        this.sparks.updateState();
+    }
+    if (game.global.settings.shadows === true) {
+        this.updateShadow();
+    }
 };
 
 MovingPlatform.prototype.update = function() {

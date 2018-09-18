@@ -2,11 +2,13 @@
 
 // eslint-disable-next-line no-unused-vars
 
-var versionGame = 'v0.99.2';
+var versionGame = 'v0.99.3';
 var users = {};
-var startLabel;
-var scoresLabel;
-var loadingLabel;
+var settingsMenu = {
+    shadows: true,
+    effects: true
+}
+var loginLabel, startLabel, scoresLabel, settingsLabel, loadingLabel;
 
 // Initialize Firebase
 var config = {
@@ -18,7 +20,6 @@ var config = {
     messagingSenderId: "48847138184"
 };
 firebase.initializeApp(config);
-firebase.auth().languageCode = 'es';
 firebase.auth().useDeviceLanguage();
 
 var provider = new firebase.auth.GoogleAuthProvider();
@@ -37,21 +38,68 @@ var menuState = {
             $(this).closest('.modal').css('display', 'none');
         });
 
-        var titleLabel = game.add.text(screenWidth / 2, screenHeight / 2 - 200, 'tower', {font: '200px Courier', fill: '#ffffff'});
+        $('.btn-save').on('click', function() {
+            $(this).closest('.modal').css('display', 'none');
+            menuState.saveUserSettings();
+        });
+
+        $('#cb-shadows').change(function() {
+            settingsMenu.shadows = $('#cb-shadows').prop('checked');
+        });
+
+        $('#cb-effects').change(function() {
+            settingsMenu.effects = $('#cb-effects').prop('checked');
+        });
+
+        var titleLabel = game.add.text(
+            screenWidth / 2, 
+            screenHeight / 2 - 200, 
+            'tower', 
+            {font: '200px Courier', fill: '#ffffff'});
         titleLabel.anchor.setTo(0.5);
 
-        loadingLabel = game.add.text(screenWidth / 2, screenHeight / 2, 'Loading...', {font: '60px Courier', fill: '#ffffff'});
+        loadingLabel = game.add.text(
+            screenWidth / 2,
+            screenHeight / 2,
+            'Loading...',
+            {font: '60px Courier', fill: '#ffffff'});
         loadingLabel.anchor.setTo(0.5);
 
-        startLabel = game.add.text(screenWidth / 2, screenHeight / 2, 'START', {font: '60px Courier', fill: '#ffffff'});
-        startLabel.events.onInputDown.add(this.logIn, this);
+        loginLabel = game.add.text(
+            screenWidth / 2,
+            screenHeight / 2,
+            'LOGIN',
+            {font: '60px Courier', fill: '#ffffff'});
+        loginLabel.events.onInputDown.add(this.logIn, this);
+        loginLabel.anchor.setTo(0.5);
+        loginLabel.visible = false;
+
+        startLabel = game.add.text(
+            screenWidth / 2,
+            screenHeight / 2,
+            'START',
+            {font: '60px Courier', fill: '#ffffff'});
+        startLabel.events.onInputDown.add(this.startGame, this);
         startLabel.anchor.setTo(0.5);
         startLabel.visible = false;
 
-        scoresLabel = game.add.text(screenWidth / 2, screenHeight / 2 + 120, 'SCORES', {font: '60px Courier', fill: '#ffffff'});
+        scoresLabel = game.add.text(
+            screenWidth / 2,
+            screenHeight / 2 + 100,
+            'SCORES',
+            {font: '60px Courier', fill: '#ffffff'});
         scoresLabel.events.onInputDown.add(this.showScores, this);
         scoresLabel.anchor.setTo(0.5);
         scoresLabel.visible = false;
+
+        settingsLabel = game.add.text(
+            screenWidth / 2,
+            screenHeight / 2 + 200,
+            'SETTINGS',
+            {font: '60px Courier', fill: '#ffffff'});
+        settingsLabel.events.onInputDown.add(this.showSettings, this);
+        settingsLabel.anchor.setTo(0.5);
+        settingsLabel.visible = false;
 
         firebase.database().ref('/users').once('value').then(function(snapshot) {
             snapshot.forEach(function(childSnapshot) {
@@ -81,25 +129,51 @@ var menuState = {
                     dieReason: 'none',
                     result: 'none',
                     seed: 'none',
+                    cheats: false,
                     versionGame: versionGame
-                }
+                },
+                settings: settingsMenu
             }
 
             if (users[user.uid] === undefined) {
                 firebase.database().ref('users/' + user.uid).update(newUser);
                 users[user.uid] = newUser;
+            } else {
+                menuState.loadUserSettings();
             }
 
-        menuState.startGame();
+            loginLabel.inputEnabled = false;
+            loginLabel.visible = false;
+            startLabel.inputEnabled = true;
+            startLabel.visible = true;
+            settingsLabel.inputEnabled = true;
+            settingsLabel.visible = true;
 
-        }).catch(function(error) {
-            var errorCode = error.code;
-            var errorMessage = error.message;
-            var credential = error.credential;
+        });
+    },
+    loadUserSettings: function() {
+        var userId = firebase.auth().currentUser.uid;
+        if (users[userId].settings != null) {
+            $('#cb-shadows').prop('checked', users[userId].settings.shadows);
+            $('#cb-effects').prop('checked', users[userId].settings.effects);
+        } else {
+            firebase.database().ref('users/' + userId).update({
+                settings: settingsMenu,
+                lastUpdate: firebase.database.ServerValue.TIMESTAMP
+            });
+        }
+    },
+    saveUserSettings: function() {
+        var userId = firebase.auth().currentUser.uid;
+        settingsMenu.shadows = $('#cb-shadows').prop('checked');
+        settingsMenu.effects = $('#cb-effects').prop('checked');
+        users[userId].settings = settingsMenu;
+        firebase.database().ref('users/' + userId).update({
+            settings: settingsMenu,
+            lastUpdate: firebase.database.ServerValue.TIMESTAMP
         });
     },
     fillScores: function() {
-
         var sortedScores = [];
         
         for (var user in users) {
@@ -157,26 +231,16 @@ var menuState = {
         );
     },
     enableButtons: function() {
+        loginLabel.inputEnabled = true;
         scoresLabel.inputEnabled = true;
-        startLabel.inputEnabled = true;
-
-        startLabel.visible = true;
+        loginLabel.visible = true;
         scoresLabel.visible = true;
         loadingLabel.visible = false;
     },
     showScores: function() {
         $('#scores').css('display', 'block');
     },
-    parseGameVersion: function(versionString) {
-        var versionRegex = /v(\d+).?(\d+)?.?(\d+)?/;
-        var match = versionRegex.exec(versionString);
-        var version = [];
-        var v1 = match[1];
-        var v2 = match[2];
-        var v3 = match[3];
-        version.push(v1 !== undefined ? v1: 0);
-        version.push(v2 !== undefined ? v2: 0);
-        version.push(v3 !== undefined ? v3: 0);
-        return version;
+    showSettings: function() {
+        $('#settings').css('display', 'block');
     }
 };

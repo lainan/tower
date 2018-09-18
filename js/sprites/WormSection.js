@@ -26,14 +26,16 @@ var WormSection = function (game, angleOffset, y) {
         tick: 0
     };
 
-    this.dust = game.add.emitter(0, 0, 1);
-    this.dust.makeParticles('dust');
-    this.dust.gravity = 10;
-    this.dust.setAlpha(0.5, 0.8);
-    this.dust.setRotation(0, 0, 0, 0);
-    this.dust.setScale(0.7, 1.2, 0.7, 1.2, 400, Phaser.Easing.Quintic.Out, true);
-    this.dust.start(false, 200, 10);
-    game.global.dustGroup.add(this.dust);
+    if (game.global.settings.effects === true) {
+        this.dust = game.add.emitter(0, 0, 1);
+        this.dust.makeParticles('dust');
+        this.dust.gravity = 10;
+        this.dust.setAlpha(0.5, 0.8);
+        this.dust.setRotation(0, 0, 0, 0);
+        this.dust.setScale(0.7, 1.2, 0.7, 1.2, 400, Phaser.Easing.Quintic.Out, true);
+        this.dust.start(false, 200, 10);
+        game.global.dustGroup.add(this.dust);
+    }
 
     this.updateState();
     game.add.existing(this);
@@ -71,8 +73,12 @@ WormSection.prototype.updateState = function() {
     this.updateFrame();
     this.depth = Math.abs(this.angleFinal - 180);
 
-    this.updateShadow();
-    this.updateDust();
+    if (game.global.settings.effects === true) {
+        this.updateDust();
+    }
+    if (game.global.settings.shadows === true) {
+        this.updateShadow();
+    }
 };
 
 WormSection.prototype.update = function() {
